@@ -134,8 +134,30 @@ export const OpenAIChat: React.FC = () => {
 
     return updatedCSV;
   };
+
+  const downloadCSV = () => {
+    const csvContent = cumulativeCSV
+      .map((row) => row.map(wrapInQuotes).join(","))
+      .join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "cumulative.csv");
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  const wrapInQuotes = (value: string) => {
+    return value.includes(",") ? `"${value}"` : value;
+  };
+
   const renderCSVTable = () => (
     <div className="csv-table-container">
+      <button onClick={downloadCSV} className="export-button">
+        Export CSV
+      </button>
       <table className="csv-table">
         <thead>
           <tr>

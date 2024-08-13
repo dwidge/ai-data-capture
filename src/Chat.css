@@ -81,6 +81,9 @@ label {
 
 .csv-table-container {
   overflow-x: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
 }
 
 .csv-table {
