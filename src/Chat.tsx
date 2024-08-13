@@ -14,6 +14,7 @@ export const OpenAIChat: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [collectCSV, setCollectCSV] = useState<boolean>(false);
   const [cumulativeCSV, setCumulativeCSV] = useState<string[][]>([]);
+  const [filters, setFilters] = useState<string[]>([]); // New state for filters
 
   const handleInputChange =
     (setter: React.Dispatch<React.SetStateAction<string | null>>) =>
@@ -25,6 +26,7 @@ export const OpenAIChat: React.FC = () => {
     setCollectCSV(e.target.checked);
     if (!e.target.checked) {
       setCumulativeCSV([]);
+      setFilters([]); // Reset filters if CSV collection is stopped
     }
   };
 
@@ -90,25 +92,65 @@ export const OpenAIChat: React.FC = () => {
 
   const [filterText, setFilterText] = useState<string>("");
 
+  const renderFilters = () => {
+    return (
+      <div
+        className="filter-tags"
+        style={{ display: "flex", flexWrap: "wrap", marginBottom: "10px" }}
+      >
+        {filters.map((filter, index) => (
+          <div
+            key={index}
+            className="filter-tag"
+            style={{ color: "red", margin: "0 5px" }}
+          >
+            {filter} <button onClick={() => removeFilter(filter)}>x</button>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const removeFilter = (filter: string) => {
+    setFilters(filters.filter((f) => f !== filter));
+  };
+
   const renderCSVTable = () => {
     const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       setFilterText(e.target.value);
     };
 
-    // Filter cumulativeCSV based on filterText
+    // Filter cumulativeCSV based on filters and filterText
     const filteredCSV = cumulativeCSV.filter((row, index) => {
       // For the header row, return true to always show it
       if (index === 0) return true;
-      return row.some((cell) =>
+
+      // Check for excluded filters
+      const excludesFilters = filters.some((filter) =>
+        row.some((cell) => cell.toLowerCase() === filter.toLowerCase())
+      );
+
+      // Check for search text in any cell
+      const matchesFilterText = row.some((cell) =>
         cell.toLowerCase().includes(filterText.toLowerCase())
       );
+
+      // Return true only if the row does not match filters and does include filterText
+      return !excludesFilters && matchesFilterText;
     });
+
+    const handleCellClick = (cell: string) => {
+      if (!filters.includes(cell)) {
+        setFilters([...filters, cell]);
+      }
+    };
 
     return (
       <div className="csv-table-container">
         <button onClick={downloadCSV} className="export-button">
           Export CSV
         </button>
+        {renderFilters()}
         <div className="input-group">
           <label>
             Search
@@ -125,7 +167,9 @@ export const OpenAIChat: React.FC = () => {
             <tr>
               {filteredCSV.length > 0 &&
                 filteredCSV[0].map((header, index) => (
-                  <th key={index}>{header}</th>
+                  <th key={index} onClick={() => handleCellClick(header)}>
+                    {header}
+                  </th>
                 ))}
             </tr>
           </thead>
@@ -133,7 +177,9 @@ export const OpenAIChat: React.FC = () => {
             {filteredCSV.slice(1).map((row, rowIndex) => (
               <tr key={rowIndex}>
                 {row.map((cell, cellIndex) => (
-                  <td key={cellIndex}>{cell}</td>
+                  <td key={cellIndex} onClick={() => handleCellClick(cell)}>
+                    {cell}
+                  </td>
                 ))}
               </tr>
             ))}
@@ -224,7 +270,6 @@ const updateCumulativeCSV = (
   newData: string,
   cumulativeCSV: string[][]
 ): string[][] => {
-  // Parse the incoming CSV data
   const lines = newData.trim().split("\n").map(parseCSVLine);
   if (lines.length === 0) return cumulativeCSV;
 
@@ -263,7 +308,6 @@ const updateCumulativeCSV = (
     return updatedCSV;
   };
 
-  // Update the cumulative CSV based on whether the new line is headers
   if (isLineHeaders(cumulativeCSV[0] ?? [], lines[0])) {
     const newHeaders = lines[0];
     const newRows = lines.slice(1);
