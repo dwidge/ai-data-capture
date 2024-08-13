@@ -20,6 +20,7 @@ export const OpenAIChat: React.FC = () => {
   const [filters, setFilters] = useState<{ [column: string]: string[] }>({});
   const [filterText, setFilterText] = useState<string>("");
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [highlightedRows, setHighlightedRows] = useState<number[]>([]);
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -79,6 +80,11 @@ export const OpenAIChat: React.FC = () => {
     setResponse(newResponse);
     if (settings)
       setCumulativeCSV(updateCumulativeCSV(newResponse, cumulativeCSV));
+
+    const newRowsCount = newResponse.trim().split("\n").length;
+    setHighlightedRows(
+      [...Array(newRowsCount).keys()].map((i) => cumulativeCSV.length + i)
+    );
   };
 
   const handleError = (error: unknown) => {
@@ -89,6 +95,7 @@ export const OpenAIChat: React.FC = () => {
     setCumulativeCSV([]);
     setFilters({});
     setFilterText("");
+    setHighlightedRows([]); // Reset highlighted rows
   };
 
   const toggleSettings = () => {
@@ -154,6 +161,7 @@ export const OpenAIChat: React.FC = () => {
           filterText={filterText}
           setFilterText={setFilterText}
           clearCSVData={clearCSVData}
+          highlightedRows={highlightedRows}
         />
       ) : (
         <div className="response-area break-word">

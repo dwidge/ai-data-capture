@@ -10,16 +10,17 @@ interface CSVTableProps {
   filterText: string;
   setFilterText: React.Dispatch<React.SetStateAction<string>>;
   clearCSVData: () => void;
+  highlightedRows: number[];
 }
 
 const CSVTable: React.FC<CSVTableProps> = ({
   cumulativeCSV,
-  // setCumulativeCSV,
   filters,
   setFilters,
   filterText,
   setFilterText,
   clearCSVData,
+  highlightedRows,
 }) => {
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilterText(e.target.value);
@@ -142,7 +143,14 @@ const CSVTable: React.FC<CSVTableProps> = ({
         </thead>
         <tbody>
           {filteredCSV.slice(1).map((row, rowIndex) => (
-            <tr key={rowIndex}>
+            <tr
+              key={rowIndex}
+              style={{
+                backgroundColor: highlightedRows.includes(rowIndex + 1)
+                  ? "#aaaaaa44"
+                  : "transparent",
+              }}
+            >
               {row.map((cell, cellIndex) => (
                 <td
                   key={cellIndex}
