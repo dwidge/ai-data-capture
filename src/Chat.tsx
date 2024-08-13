@@ -7,6 +7,7 @@ import OpenAi from "openai";
 import "./Chat.css";
 import { parseCSVLine } from "./utils/parseCSVLine";
 import CSVTable from "./CSVTable";
+import { SettingsContainer } from "./Settings";
 
 export const OpenAIChat: React.FC = () => {
   const [openaiKey, setOpenaiKey] = useOpenaiKey();
@@ -26,9 +27,9 @@ export const OpenAIChat: React.FC = () => {
       setter(e.target.value || null);
     };
 
-  const handleCollectCSVChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSettings({ ...settings, csv: e.target.checked });
-    if (!e.target.checked) {
+  const handleCollectCSVChange = (checked: boolean) => {
+    setSettings({ ...settings, csv: checked });
+    if (!checked) {
       setCumulativeCSV([]);
       setFilters({});
     }
@@ -116,40 +117,14 @@ export const OpenAIChat: React.FC = () => {
         </button>
 
         {isSettingsOpen && (
-          <div className="settings-container">
-            <div className="input-group">
-              <label>
-                OpenAI API Key:
-                <input
-                  type="text"
-                  value={openaiKey || ""}
-                  onChange={handleInputChange(setOpenaiKey)}
-                  className="input-field"
-                />
-              </label>
-            </div>
-            <div className="input-group">
-              <label>
-                System Prompt:
-                <textarea
-                  value={systemPrompt || ""}
-                  onChange={handleInputChange(setSystemPrompt)}
-                  className="input-field"
-                  rows={4}
-                />
-              </label>
-            </div>
-            <div className="input-group">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={settings?.csv ?? false}
-                  onChange={handleCollectCSVChange}
-                />{" "}
-                CSV
-              </label>
-            </div>
-          </div>
+          <SettingsContainer
+            openaiKey={openaiKey}
+            systemPrompt={systemPrompt}
+            settings={settings}
+            onOpenaiKeyChange={setOpenaiKey}
+            onSystemPromptChange={setSystemPrompt}
+            onCollectCSVChange={handleCollectCSVChange}
+          />
         )}
       </div>
 
