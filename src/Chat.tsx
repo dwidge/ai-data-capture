@@ -18,6 +18,7 @@ export const OpenAIChat: React.FC = () => {
   const [cumulativeCSV, setCumulativeCSV] = useState<string[][]>([]);
   const [filters, setFilters] = useState<{ [column: string]: string[] }>({});
   const [filterText, setFilterText] = useState<string>("");
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
   const handleInputChange =
     (setter: React.Dispatch<React.SetStateAction<string | null>>) =>
@@ -87,6 +88,10 @@ export const OpenAIChat: React.FC = () => {
     setFilterText("");
   };
 
+  const toggleSettings = () => {
+    setIsSettingsOpen((prev) => !prev);
+  };
+
   return (
     <div className="main-container">
       <div className="user-input-container">
@@ -104,44 +109,51 @@ export const OpenAIChat: React.FC = () => {
           Send
         </button>
       </div>
-      <div className="settings-container">
-        <div className="input-group">
-          <label>
-            OpenAI API Key:
-            <input
-              type="text"
-              value={openaiKey || ""}
-              onChange={handleInputChange(setOpenaiKey)}
-              className="input-field"
-            />
-          </label>
-        </div>
-        <div className="input-group">
-          <label>
-            System Prompt:
-            <textarea
-              value={systemPrompt || ""}
-              onChange={handleInputChange(setSystemPrompt)}
-              className="input-field"
-              rows={4}
-            />
-          </label>
-        </div>
-        <div className="input-group">
-          <label>
-            <input
-              type="checkbox"
-              checked={settings?.csv ?? false}
-              onChange={handleCollectCSVChange}
-            />{" "}
-            CSV
-          </label>
-        </div>
-        <div className="response-area break-word">
-          {loading ? "Busy..." : response}
-        </div>
+
+      <div className="settings-expander">
+        <button onClick={toggleSettings} className="expander-button">
+          {isSettingsOpen ? "Hide Settings" : "Show Settings"}
+        </button>
+
+        {isSettingsOpen && (
+          <div className="settings-container">
+            <div className="input-group">
+              <label>
+                OpenAI API Key:
+                <input
+                  type="text"
+                  value={openaiKey || ""}
+                  onChange={handleInputChange(setOpenaiKey)}
+                  className="input-field"
+                />
+              </label>
+            </div>
+            <div className="input-group">
+              <label>
+                System Prompt:
+                <textarea
+                  value={systemPrompt || ""}
+                  onChange={handleInputChange(setSystemPrompt)}
+                  className="input-field"
+                  rows={4}
+                />
+              </label>
+            </div>
+            <div className="input-group">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={settings?.csv ?? false}
+                  onChange={handleCollectCSVChange}
+                />{" "}
+                CSV
+              </label>
+            </div>
+          </div>
+        )}
       </div>
-      {settings && cumulativeCSV.length > 0 && (
+
+      {settings?.csv ? (
         <CSVTable
           cumulativeCSV={cumulativeCSV}
           setCumulativeCSV={setCumulativeCSV}
@@ -151,6 +163,10 @@ export const OpenAIChat: React.FC = () => {
           setFilterText={setFilterText}
           clearCSVData={clearCSVData}
         />
+      ) : (
+        <div className="response-area break-word">
+          {loading ? "Busy..." : response}
+        </div>
       )}
     </div>
   );
