@@ -88,11 +88,11 @@ const CSVTable: React.FC<CSVTableProps> = ({
   return (
     <div className="csv-table-container">
       <div className="csv-table-buttons">
+        <button onClick={clearCSVData} className="clear-button">
+          Clear Data
+        </button>
         <button onClick={downloadCSV} className="export-button">
           Export CSV
-        </button>
-        <button onClick={clearCSVData} className="clear-button">
-          Clear
         </button>
       </div>
       {renderFilters()}

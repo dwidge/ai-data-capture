@@ -106,27 +106,30 @@ export const OpenAIChat: React.FC = () => {
             />
           </label>
         </div>
-        <button onClick={handleSubmit} className="send-button">
-          Send
-        </button>
+        <div className="csv-table-buttons">
+          <button
+            onClick={toggleSettings}
+            className="expander-button"
+            style={{ flex: 0 }}
+          >
+            Settings
+          </button>
+          <button onClick={handleSubmit} className="send-button">
+            Submit
+          </button>
+        </div>
       </div>
 
-      <div className="settings-expander">
-        <button onClick={toggleSettings} className="expander-button">
-          {isSettingsOpen ? "Hide Settings" : "Show Settings"}
-        </button>
-
-        {isSettingsOpen && (
-          <SettingsContainer
-            openaiKey={openaiKey}
-            systemPrompt={systemPrompt}
-            settings={settings}
-            onOpenaiKeyChange={setOpenaiKey}
-            onSystemPromptChange={setSystemPrompt}
-            onCollectCSVChange={handleCollectCSVChange}
-          />
-        )}
-      </div>
+      {isSettingsOpen && (
+        <SettingsContainer
+          openaiKey={openaiKey}
+          systemPrompt={systemPrompt}
+          settings={settings}
+          onOpenaiKeyChange={setOpenaiKey}
+          onSystemPromptChange={setSystemPrompt}
+          onCollectCSVChange={handleCollectCSVChange}
+        />
+      )}
 
       {settings?.csv ? (
         <CSVTable

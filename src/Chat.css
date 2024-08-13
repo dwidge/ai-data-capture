@@ -45,17 +45,6 @@ label {
   min-height: 80px;
 }
 
-.send-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
 .send-button:hover {
   background-color: #45a049;
 }
@@ -109,6 +98,11 @@ button {
 
 .csv-table th {
   background-color: #525252; /* Differentiate header row */
+}
+
+.send-button {
+  background-color: #327534; /* Green */
+  color: white;
 }
 
 .export-button {
