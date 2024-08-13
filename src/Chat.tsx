@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react"; // Added import for useRef
 import { useOpenaiKey } from "./hooks/useOpenaiKey";
 import { useSystemPrompt } from "./hooks/useSystemPrompt";
 import { useUserPrompt } from "./hooks/useUserPrompt";
@@ -20,6 +20,8 @@ export const OpenAIChat: React.FC = () => {
   const [filters, setFilters] = useState<{ [column: string]: string[] }>({});
   const [filterText, setFilterText] = useState<string>("");
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const handleInputChange =
     (setter: React.Dispatch<React.SetStateAction<string | null>>) =>
@@ -93,16 +95,24 @@ export const OpenAIChat: React.FC = () => {
     setIsSettingsOpen((prev) => !prev);
   };
 
+  const handleTextareaFocus = () => {
+    if (textareaRef.current) {
+      textareaRef.current.select();
+    }
+  };
+
   return (
     <div className="main-container">
       <div className="user-input-container">
         <div className="input-group">
           <label>
             <textarea
+              ref={textareaRef}
               value={userPrompt || ""}
               onChange={handleInputChange(setUserPrompt)}
               className="input-field"
               rows={4}
+              onFocus={handleTextareaFocus}
             />
           </label>
         </div>
