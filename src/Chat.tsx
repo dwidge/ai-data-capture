@@ -89,8 +89,22 @@ export const OpenAIChat: React.FC = () => {
 
   return (
     <div className="main-container">
+      <div className="user-input-container">
+        <div className="input-group">
+          <label>
+            <textarea
+              value={userPrompt || ""}
+              onChange={handleInputChange(setUserPrompt)}
+              className="input-field"
+              rows={4}
+            />
+          </label>
+        </div>
+        <button onClick={handleSubmit} className="send-button">
+          Send
+        </button>
+      </div>
       <div className="chat-container">
-        <h1>AI Chat</h1>
         <div className="input-group">
           <label>
             OpenAI API Key:
@@ -115,17 +129,6 @@ export const OpenAIChat: React.FC = () => {
         </div>
         <div className="input-group">
           <label>
-            User Prompt:
-            <textarea
-              value={userPrompt || ""}
-              onChange={handleInputChange(setUserPrompt)}
-              className="input-field"
-              rows={4}
-            />
-          </label>
-        </div>
-        <div className="input-group">
-          <label>
             <input
               type="checkbox"
               checked={settings?.csv ?? false}
@@ -134,9 +137,6 @@ export const OpenAIChat: React.FC = () => {
             CSV
           </label>
         </div>
-        <button onClick={handleSubmit} className="send-button">
-          Send
-        </button>
         <div className="response-area break-word">
           {loading ? "Busy..." : response}
         </div>
