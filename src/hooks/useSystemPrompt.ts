@@ -1,15 +1,3 @@
-import { useState, useEffect } from "react";
+import { useLocalStorage } from "./useLocalStorage";
 
-export function useSystemPrompt() {
-  const [prompt, setPrompt] = useState<string | null>(() => {
-    return localStorage.getItem("system_prompt");
-  });
-
-  useEffect(() => {
-    if (prompt) {
-      localStorage.setItem("system_prompt", prompt);
-    }
-  }, [prompt]);
-
-  return [prompt, setPrompt] as const;
-}
+export const useSystemPrompt = () => useLocalStorage("system_prompt", null);

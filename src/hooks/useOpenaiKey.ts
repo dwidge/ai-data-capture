@@ -1,15 +1,3 @@
-import { useState, useEffect } from "react";
+import { useLocalStorage } from "./useLocalStorage";
 
-export function useOpenaiKey() {
-  const [key, setKey] = useState<string | null>(() => {
-    return localStorage.getItem("openai_key");
-  });
-
-  useEffect(() => {
-    if (key) {
-      localStorage.setItem("openai_key", key);
-    }
-  }, [key]);
-
-  return [key, setKey] as const;
-}
+export const useOpenaiKey = () => useLocalStorage("openai_key", null);
