@@ -76,7 +76,8 @@ export const OpenAIChat: React.FC = () => {
   };
 
   const downloadCSV = () => {
-    const csvContent = cumulativeCSV
+    const filteredCSV = applyFiltersToCSV(cumulativeCSV, filters, filterText);
+    const csvContent = filteredCSV
       .map((row) => row.map(wrapInQuotes).join(","))
       .join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -121,23 +122,7 @@ export const OpenAIChat: React.FC = () => {
     };
 
     // Filter cumulativeCSV based on filters and filterText
-    const filteredCSV = cumulativeCSV.filter((row, index) => {
-      // For the header row, return true to always show it
-      if (index === 0) return true;
-
-      // Check for excluded filters
-      const excludesFilters = filters.some((filter) =>
-        row.some((cell) => cell.toLowerCase() === filter.toLowerCase())
-      );
-
-      // Check for search text in any cell
-      const matchesFilterText = row.some((cell) =>
-        cell.toLowerCase().includes(filterText.toLowerCase())
-      );
-
-      // Return true only if the row does not match filters and does include filterText
-      return !excludesFilters && matchesFilterText;
-    });
+    const filteredCSV = applyFiltersToCSV(cumulativeCSV, filters, filterText);
 
     const handleCellClick = (cell: string) => {
       if (!filters.includes(cell)) {
@@ -317,4 +302,28 @@ const updateCumulativeCSV = (
     const newRows = lines;
     return createUpdatedCSV(cumulativeCSV, newHeaders, newRows);
   }
+};
+
+const applyFiltersToCSV = (
+  rows: string[][],
+  excludes: string[],
+  include: string
+): string[][] => {
+  return rows.filter((row, index) => {
+    // For the header row, return true to always show it
+    if (index === 0) return true;
+
+    // Check for excluded filters
+    const excludesFilters = excludes.some((filter) =>
+      row.some((cell) => cell.toLowerCase() === filter.toLowerCase())
+    );
+
+    // Check for search text in any cell
+    const matchesFilterText = row.some((cell) =>
+      cell.toLowerCase().includes(include.toLowerCase())
+    );
+
+    // Return true only if the row does not match filters and does include filterText
+    return !excludesFilters && matchesFilterText;
+  });
 };
