@@ -51,7 +51,10 @@ export const OpenAIChat: React.FC = () => {
         ],
       });
 
-      handleResponse(completion.choices[0]?.message?.content || "No response");
+      const trimmedResponse =
+        completion.choices[0]?.message?.content?.replace(/^```|```$/g, "") ||
+        "No response";
+      handleResponse(trimmedResponse);
     } catch (error) {
       handleError(error);
     } finally {
