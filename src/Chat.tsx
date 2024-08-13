@@ -15,6 +15,7 @@ export const OpenAIChat: React.FC = () => {
   const [collectCSV, setCollectCSV] = useState<boolean>(false);
   const [cumulativeCSV, setCumulativeCSV] = useState<string[][]>([]);
   const [filters, setFilters] = useState<{ [column: string]: string[] }>({});
+  const [filterText, setFilterText] = useState<string>("");
 
   const handleInputChange =
     (setter: React.Dispatch<React.SetStateAction<string | null>>) =>
@@ -91,7 +92,11 @@ export const OpenAIChat: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  const [filterText, setFilterText] = useState<string>("");
+  const clearCSVData = () => {
+    setCumulativeCSV([]);
+    setFilters({});
+    setFilterText("");
+  };
 
   const renderFilters = () => {
     return (
@@ -127,7 +132,6 @@ export const OpenAIChat: React.FC = () => {
       setFilterText(e.target.value);
     };
 
-    // Filter cumulativeCSV based on filters and filterText
     const filteredCSV = applyFiltersToCSV(cumulativeCSV, filters, filterText);
 
     const handleCellClick = (cell: string, column: string) => {
@@ -141,9 +145,14 @@ export const OpenAIChat: React.FC = () => {
 
     return (
       <div className="csv-table-container">
-        <button onClick={downloadCSV} className="export-button">
-          Export CSV
-        </button>
+        <div className="csv-table-buttons">
+          <button onClick={downloadCSV} className="export-button">
+            Export CSV
+          </button>
+          <button onClick={clearCSVData} className="clear-button">
+            Clear
+          </button>
+        </div>
         {renderFilters()}
         <div className="input-group">
           <label>
