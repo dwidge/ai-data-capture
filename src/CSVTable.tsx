@@ -60,20 +60,42 @@ const CSVTable: React.FC<CSVTableProps> = ({
     return (
       <div
         className="filter-tags"
-        style={{ display: "flex", flexWrap: "wrap", marginBottom: "10px" }}
+        style={{
+          display: "flex",
+          flex: 1,
+          flexDirection: "column",
+          gap: ".5em",
+        }}
       >
-        {Object.entries(filters).flatMap(([column, columnFilters]) =>
-          columnFilters.map((filter, index) => (
-            <div
-              key={`${column}-${index}`}
-              className="filter-tag"
-              style={{ color: "red", margin: "0 5px" }}
-            >
-              {`${column} = "${filter}"`}{" "}
-              <button onClick={() => removeFilter(column, filter)}>x</button>
-            </div>
-          ))
-        )}
+        <label>Exclude</label>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(15em, 1fr))",
+            gap: ".5em",
+          }}
+        >
+          {Object.entries(filters).flatMap(([column, columnFilters]) =>
+            columnFilters.map((filter, index) => (
+              <button
+                key={`${column}-${index}`}
+                className="filter-tag"
+                style={{
+                  color: "white",
+                  backgroundColor: "darkred",
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+                onClick={() => removeFilter(column, filter)}
+                aria-label={`Remove filter ${filter} from ${column}`}
+              >
+                <div style={{ fontStyle: "italic" }}>{`${column}`}</div>
+                <div>{`"${filter}"`}</div>
+              </button>
+            ))
+          )}
+        </div>
       </div>
     );
   };
@@ -95,7 +117,7 @@ const CSVTable: React.FC<CSVTableProps> = ({
           Export CSV
         </button>
       </div>
-      {renderFilters()}
+      {!!Object.entries(filters).length && renderFilters()}
       <div className="input-group">
         <label>
           Search
