@@ -108,6 +108,14 @@ export const OpenAIChat: React.FC = () => {
     }
   };
 
+  const deleteHighlightedRows = () => {
+    const newCumulativeCSV = cumulativeCSV.filter(
+      (_, index) => !highlightedRows.includes(index)
+    );
+    setCumulativeCSV(newCumulativeCSV);
+    setHighlightedRows([]);
+  };
+
   return (
     <div className="main-container">
       <div className="user-input-container">
@@ -130,6 +138,13 @@ export const OpenAIChat: React.FC = () => {
             style={{ flex: 0 }}
           >
             Settings
+          </button>
+          <button
+            onClick={deleteHighlightedRows}
+            className={highlightedRows.length > 0 ? "undo-button" : ""}
+            disabled={highlightedRows.length === 0}
+          >
+            Undo
           </button>
           <button
             onClick={handleSubmit}
