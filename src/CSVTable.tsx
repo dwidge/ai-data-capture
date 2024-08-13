@@ -142,27 +142,29 @@ const CSVTable: React.FC<CSVTableProps> = ({
           </tr>
         </thead>
         <tbody>
-          {filteredCSV.slice(1).map((row, rowIndex) => (
-            <tr
-              key={rowIndex}
-              style={{
-                backgroundColor: highlightedRows.includes(rowIndex + 1)
-                  ? "#aaaaaa44"
-                  : "transparent",
-              }}
-            >
-              {row.map((cell, cellIndex) => (
-                <td
-                  key={cellIndex}
-                  onClick={() =>
-                    handleCellClick(cell, filteredCSV[0][cellIndex])
-                  }
-                >
-                  {cell}
-                </td>
-              ))}
-            </tr>
-          ))}
+          {cumulativeCSV.slice(1).map((row, rowIndex) =>
+            filterRow(cumulativeCSV[0], filters, filterText)(row) ? (
+              <tr
+                key={rowIndex}
+                style={{
+                  backgroundColor: highlightedRows.includes(rowIndex + 1)
+                    ? "#aaaaaa44"
+                    : "transparent",
+                }}
+              >
+                {row.map((cell, cellIndex) => (
+                  <td
+                    key={cellIndex}
+                    onClick={() =>
+                      handleCellClick(cell, filteredCSV[0][cellIndex])
+                    }
+                  >
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ) : null
+          )}
         </tbody>
       </table>
     </div>
