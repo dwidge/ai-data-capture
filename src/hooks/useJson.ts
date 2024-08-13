@@ -1,4 +1,4 @@
-export const useJson = <T>([value, setValue]: [
+export const useJson = <T>([value, setValue]: readonly [
   string | null,
   React.Dispatch<React.SetStateAction<string | null>>
 ]) =>

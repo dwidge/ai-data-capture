@@ -2,18 +2,19 @@ import React, { useState } from "react";
 import { useOpenaiKey } from "./hooks/useOpenaiKey";
 import { useSystemPrompt } from "./hooks/useSystemPrompt";
 import { useUserPrompt } from "./hooks/useUserPrompt";
+import { useSettings } from "./hooks/useSettings";
 import OpenAi from "openai";
 import "./Chat.css";
 import { parseCSVLine } from "./utils/parseCSVLine";
-import CSVTable from "./CSVTable"; // Importing the new CSVTable component
+import CSVTable from "./CSVTable";
 
 export const OpenAIChat: React.FC = () => {
   const [openaiKey, setOpenaiKey] = useOpenaiKey();
   const [systemPrompt, setSystemPrompt] = useSystemPrompt();
   const [userPrompt, setUserPrompt] = useUserPrompt();
+  const [settings, setSettings] = useSettings();
   const [response, setResponse] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [collectCSV, setCollectCSV] = useState<boolean>(false);
   const [cumulativeCSV, setCumulativeCSV] = useState<string[][]>([]);
   const [filters, setFilters] = useState<{ [column: string]: string[] }>({});
   const [filterText, setFilterText] = useState<string>("");
@@ -25,7 +26,7 @@ export const OpenAIChat: React.FC = () => {
     };
 
   const handleCollectCSVChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCollectCSV(e.target.checked);
+    setSettings({ ...settings, csv: e.target.checked });
     if (!e.target.checked) {
       setCumulativeCSV([]);
       setFilters({});
@@ -40,7 +41,7 @@ export const OpenAIChat: React.FC = () => {
 
       const effectiveSystemPrompt = prepareSystemPrompt(
         systemPrompt,
-        collectCSV,
+        settings?.csv ?? false,
         cumulativeCSV
       );
 
@@ -72,7 +73,7 @@ export const OpenAIChat: React.FC = () => {
 
   const handleResponse = (newResponse: string) => {
     setResponse(newResponse);
-    if (collectCSV)
+    if (settings)
       setCumulativeCSV(updateCumulativeCSV(newResponse, cumulativeCSV));
   };
 
@@ -127,7 +128,7 @@ export const OpenAIChat: React.FC = () => {
           <label>
             <input
               type="checkbox"
-              checked={collectCSV}
+              checked={settings?.csv ?? false}
               onChange={handleCollectCSVChange}
             />{" "}
             CSV
@@ -140,7 +141,7 @@ export const OpenAIChat: React.FC = () => {
           {loading ? "Busy..." : response}
         </div>
       </div>
-      {collectCSV && cumulativeCSV.length > 0 && (
+      {settings && cumulativeCSV.length > 0 && (
         <CSVTable
           cumulativeCSV={cumulativeCSV}
           setCumulativeCSV={setCumulativeCSV}
