@@ -88,32 +88,60 @@ export const OpenAIChat: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  const renderCSVTable = () => (
-    <div className="csv-table-container">
-      <button onClick={downloadCSV} className="export-button">
-        Export CSV
-      </button>
-      <table className="csv-table">
-        <thead>
-          <tr>
-            {cumulativeCSV.length > 0 &&
-              cumulativeCSV[0].map((header, index) => (
-                <th key={index}>{header}</th>
-              ))}
-          </tr>
-        </thead>
-        <tbody>
-          {cumulativeCSV.slice(1).map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              {row.map((cell, cellIndex) => (
-                <td key={cellIndex}>{cell}</td>
-              ))}
+  const [filterText, setFilterText] = useState<string>("");
+
+  const renderCSVTable = () => {
+    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFilterText(e.target.value);
+    };
+
+    // Filter cumulativeCSV based on filterText
+    const filteredCSV = cumulativeCSV.filter((row, index) => {
+      // For the header row, return true to always show it
+      if (index === 0) return true;
+      return row.some((cell) =>
+        cell.toLowerCase().includes(filterText.toLowerCase())
+      );
+    });
+
+    return (
+      <div className="csv-table-container">
+        <button onClick={downloadCSV} className="export-button">
+          Export CSV
+        </button>
+        <div className="input-group">
+          <label>
+            Search
+            <input
+              type="text"
+              value={filterText}
+              onChange={handleFilterChange}
+              className="input-field"
+            />
+          </label>
+        </div>
+        <table className="csv-table">
+          <thead>
+            <tr>
+              {filteredCSV.length > 0 &&
+                filteredCSV[0].map((header, index) => (
+                  <th key={index}>{header}</th>
+                ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+          </thead>
+          <tbody>
+            {filteredCSV.slice(1).map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {row.map((cell, cellIndex) => (
+                  <td key={cellIndex}>{cell}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
 
   return (
     <div className="main-container">
