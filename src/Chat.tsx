@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useOpenaiKey } from "./hooks/useOpenaiKey";
 import { useSystemPrompt } from "./hooks/useSystemPrompt";
+import { useUserPrompt } from "./hooks/useUserPrompt";
 import OpenAi from "openai";
 import "./Chat.css";
 import { parseCSVLine } from "./utils/parseCSVLine";
@@ -8,7 +9,7 @@ import { parseCSVLine } from "./utils/parseCSVLine";
 export const OpenAIChat: React.FC = () => {
   const [openaiKey, setOpenaiKey] = useOpenaiKey();
   const [systemPrompt, setSystemPrompt] = useSystemPrompt();
-  const [userPrompt, setUserPrompt] = useState<string | null>("");
+  const [userPrompt, setUserPrompt] = useUserPrompt();
   const [response, setResponse] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [collectCSV, setCollectCSV] = useState<boolean>(false);
