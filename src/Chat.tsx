@@ -34,7 +34,11 @@ export const OpenAIChat: React.FC = () => {
       if (!openaiKey) throw new Error("Please set an OpenAI API key.");
       const openai = createOpenAiInstance(openaiKey);
 
-      const effectiveSystemPrompt = prepareSystemPrompt();
+      const effectiveSystemPrompt = prepareSystemPrompt(
+        systemPrompt,
+        collectCSV,
+        cumulativeCSV
+      );
 
       const completion = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
@@ -59,81 +63,14 @@ export const OpenAIChat: React.FC = () => {
     });
   };
 
-  const csvHeaderRow = cumulativeCSV[0]?.join(",");
-  const prepareSystemPrompt = () => {
-    const headersString = cumulativeCSV.length > 0 ? csvHeaderRow : "";
-
-    return collectCSV
-      ? `${
-          systemPrompt || ""
-        }\nalways respond in csv\nexisting headers:\n${headersString}`
-      : systemPrompt || "";
-  };
-
   const handleResponse = (newResponse: string) => {
     setResponse(newResponse);
-    if (collectCSV) {
-      updateCumulativeCSV(newResponse);
-    }
+    if (collectCSV)
+      setCumulativeCSV(updateCumulativeCSV(newResponse, cumulativeCSV));
   };
 
   const handleError = (error: unknown) => {
     setResponse("Error: " + (error as Error).message);
-  };
-
-  const updateCumulativeCSV = (newData: string) => {
-    const lines = newData.trim().split("\n").map(parseCSVLine);
-
-    if (lines.length === 0) return;
-
-    if (isLineHeaders(cumulativeCSV[0] ?? [], lines[0])) {
-      const newHeaders = lines[0];
-      const newRows = lines.slice(1);
-      setCumulativeCSV((prevCSV) =>
-        createUpdatedCSV(prevCSV, newHeaders, newRows)
-      );
-    } else {
-      const newHeaders = cumulativeCSV[0];
-      const newRows = lines;
-      setCumulativeCSV((prevCSV) =>
-        createUpdatedCSV(prevCSV, newHeaders, newRows)
-      );
-    }
-  };
-
-  const isLineHeaders = (currentHeaders: string[], line: string[]) =>
-    currentHeaders.length === 0 ||
-    currentHeaders.some((col) => line.includes(col));
-
-  const createUpdatedCSV = (
-    prevCSV: string[][],
-    newHeaders: string[],
-    lines: string[][]
-  ) => {
-    const existingHeaders = new Set(prevCSV.length > 0 ? prevCSV[0] : []);
-    const existingContent = prevCSV.slice(1);
-    const headerList = [...existingHeaders].concat(
-      newHeaders.filter((header) => !existingHeaders.has(header))
-    );
-
-    const updatedCSV: string[][] = [headerList];
-
-    existingContent.forEach((row) => {
-      const updatedRow = headerList.map((_, idx) => {
-        return row[idx] ?? "";
-      });
-      updatedCSV.push(updatedRow);
-    });
-
-    lines.forEach((row) => {
-      const updatedRow = headerList.map((header) => {
-        const idx = newHeaders.indexOf(header);
-        return idx !== -1 ? row[idx] ?? "" : "";
-      });
-      updatedCSV.push(updatedRow);
-    });
-
-    return updatedCSV;
   };
 
   const downloadCSV = () => {
@@ -150,9 +87,6 @@ export const OpenAIChat: React.FC = () => {
     link.click();
     document.body.removeChild(link);
   };
-  const wrapInQuotes = (value: string) => {
-    return value.includes(",") ? `"${value}"` : value;
-  };
 
   const renderCSVTable = () => (
     <div className="csv-table-container">
@@ -162,9 +96,10 @@ export const OpenAIChat: React.FC = () => {
       <table className="csv-table">
         <thead>
           <tr>
-            {cumulativeCSV[0].map((header, index) => (
-              <th key={index}>{header}</th>
-            ))}
+            {cumulativeCSV.length > 0 &&
+              cumulativeCSV[0].map((header, index) => (
+                <th key={index}>{header}</th>
+              ))}
           </tr>
         </thead>
         <tbody>
@@ -237,4 +172,77 @@ export const OpenAIChat: React.FC = () => {
       {collectCSV && cumulativeCSV.length > 0 && renderCSVTable()}
     </div>
   );
+};
+
+const wrapInQuotes = (value: string) => {
+  return value.includes(",") ? `"${value}"` : value;
+};
+
+const prepareSystemPrompt = (
+  systemPrompt: string | null,
+  collectCSV: boolean,
+  cumulativeCSV: string[][]
+): string => {
+  const headersString =
+    cumulativeCSV.length > 0 ? cumulativeCSV[0]?.join(",") : "";
+  return collectCSV
+    ? `${
+        systemPrompt || ""
+      }\nalways respond in csv\nexisting headers:\n${headersString}`
+    : systemPrompt || "";
+};
+
+const updateCumulativeCSV = (
+  newData: string,
+  cumulativeCSV: string[][]
+): string[][] => {
+  // Parse the incoming CSV data
+  const lines = newData.trim().split("\n").map(parseCSVLine);
+  if (lines.length === 0) return cumulativeCSV;
+
+  const isLineHeaders = (currentHeaders: string[], line: string[]) =>
+    currentHeaders.length === 0 ||
+    currentHeaders.some((col) => line.includes(col));
+
+  const createUpdatedCSV = (
+    prevCSV: string[][],
+    newHeaders: string[],
+    lines: string[][]
+  ): string[][] => {
+    const existingHeaders = new Set(prevCSV.length > 0 ? prevCSV[0] : []);
+    const existingContent = prevCSV.slice(1);
+    const headerList = [...existingHeaders].concat(
+      newHeaders.filter((header) => !existingHeaders.has(header))
+    );
+
+    const updatedCSV: string[][] = [headerList];
+
+    existingContent.forEach((row) => {
+      const updatedRow = headerList.map((_, idx) => {
+        return row[idx] ?? "";
+      });
+      updatedCSV.push(updatedRow);
+    });
+
+    lines.forEach((row) => {
+      const updatedRow = headerList.map((header) => {
+        const idx = newHeaders.indexOf(header);
+        return idx !== -1 ? row[idx] ?? "" : "";
+      });
+      updatedCSV.push(updatedRow);
+    });
+
+    return updatedCSV;
+  };
+
+  // Update the cumulative CSV based on whether the new line is headers
+  if (isLineHeaders(cumulativeCSV[0] ?? [], lines[0])) {
+    const newHeaders = lines[0];
+    const newRows = lines.slice(1);
+    return createUpdatedCSV(cumulativeCSV, newHeaders, newRows);
+  } else {
+    const newHeaders = cumulativeCSV[0];
+    const newRows = lines;
+    return createUpdatedCSV(cumulativeCSV, newHeaders, newRows);
+  }
 };
