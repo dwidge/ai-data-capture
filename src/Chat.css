@@ -111,6 +111,24 @@ button {
   background-color: #525252; /* Differentiate header row */
 }
 
+.export-button {
+  background-color: #327534; /* Green */
+  color: white;
+}
+
+.export-button:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+
+.clear-button {
+  background-color: #b42f25; /* Red */
+  color: white;
+}
+
+.clear-button:hover {
+  background-color: #d32f2f; /* Darker red on hover */
+}
+
 /* Light Mode Adjustments */
 @media (prefers-color-scheme: light) {
   .chat-container {
