@@ -114,8 +114,12 @@ export const OpenAIChat: React.FC = () => {
           >
             Settings
           </button>
-          <button onClick={handleSubmit} className="send-button">
-            Submit
+          <button
+            onClick={handleSubmit}
+            className="send-button"
+            disabled={loading}
+          >
+            {loading ? <div className="spinner" /> : "Submit"}
           </button>
         </div>
       </div>
