@@ -104,7 +104,7 @@ export const OpenAIChat: React.FC = () => {
           Send
         </button>
       </div>
-      <div className="chat-container">
+      <div className="settings-container">
         <div className="input-group">
           <label>
             OpenAI API Key:

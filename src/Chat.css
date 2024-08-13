@@ -5,7 +5,7 @@
   gap: 1em;
 }
 
-.chat-container {
+.settings-container {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -131,7 +131,7 @@ button {
 
 /* Light Mode Adjustments */
 @media (prefers-color-scheme: light) {
-  .chat-container {
+  .settings-container {
     background-color: #f8f8f8; /* Light mode background */
     box-shadow: 0 0px 8px rgba(0, 0, 0, 0.1);
   }
