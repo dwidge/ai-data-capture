@@ -178,14 +178,20 @@ const applyFiltersToCSV = (
   excludes: { [column: string]: string[] },
   include: string
 ): string[][] =>
-  rows.filter((row, rowIndex) => {
-    // Always include the header row
-    if (rowIndex === 0) return true;
+  [rows[0] ?? []].concat(
+    rows.slice(1).filter(filterRow(rows[0], excludes, include))
+  );
 
+const filterRow =
+  (
+    headers: string[],
+    excludes: { [column: string]: string[] },
+    include: string
+  ) =>
+  (row: string[]) => {
     // Check for excluded filters
     const excludesFilters = Object.entries(excludes).some(
       ([column, columnFilters]) => {
-        const headers = rows[0];
         const colIndex = headers.indexOf(column); // Find the index of the column
         if (colIndex === -1) return false; // Column doesn't exist
 
@@ -203,6 +209,6 @@ const applyFiltersToCSV = (
 
     // Return true only if the row does not match any excludes AND does match the filter text
     return !excludesFilters && matchesFilterText;
-  });
+  };
 
 export default CSVTable;
