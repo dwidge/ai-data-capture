@@ -1,6 +1,13 @@
+.main-container {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1em;
+}
+
 .chat-container {
   display: flex;
-  flex: auto;
+  flex: 1;
   flex-direction: column;
   max-width: 800px;
   margin: 0 auto;
@@ -62,6 +69,34 @@ label {
   min-height: 50px;
   text-align: center;
   white-space: pre-wrap;
+}
+
+.break-word {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+  white-space: break-spaces;
+}
+
+.csv-table-container {
+  overflow-x: auto;
+}
+
+.csv-table {
+  min-width: 100%;
+  border-collapse: collapse;
+}
+
+.csv-table th,
+.csv-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.csv-table th {
+  background-color: #525252; /* Differentiate header row */
 }
 
 /* Light Mode Adjustments */

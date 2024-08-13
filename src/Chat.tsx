@@ -134,78 +134,83 @@ export const OpenAIChat: React.FC = () => {
 
     return updatedCSV;
   };
-
   const renderCSVTable = () => (
-    <table className="csv-table">
-      <thead>
-        <tr>
-          {cumulativeCSV[0].map((header, index) => (
-            <th key={index}>{header}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {cumulativeCSV.slice(1).map((row, rowIndex) => (
-          <tr key={rowIndex}>
-            {row.map((cell, cellIndex) => (
-              <td key={cellIndex}>{cell}</td>
+    <div className="csv-table-container">
+      <table className="csv-table">
+        <thead>
+          <tr>
+            {cumulativeCSV[0].map((header, index) => (
+              <th key={index}>{header}</th>
             ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {cumulativeCSV.slice(1).map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              {row.map((cell, cellIndex) => (
+                <td key={cellIndex}>{cell}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 
   return (
-    <div className="chat-container">
-      <h1>AI Chat</h1>
-      <div className="input-group">
-        <label>
-          OpenAI API Key:
-          <input
-            type="text"
-            value={openaiKey || ""}
-            onChange={handleInputChange(setOpenaiKey)}
-            className="input-field"
-          />
-        </label>
+    <div className="main-container">
+      <div className="chat-container">
+        <h1>AI Chat</h1>
+        <div className="input-group">
+          <label>
+            OpenAI API Key:
+            <input
+              type="text"
+              value={openaiKey || ""}
+              onChange={handleInputChange(setOpenaiKey)}
+              className="input-field"
+            />
+          </label>
+        </div>
+        <div className="input-group">
+          <label>
+            System Prompt:
+            <textarea
+              value={systemPrompt || ""}
+              onChange={handleInputChange(setSystemPrompt)}
+              className="input-field"
+              rows={4}
+            />
+          </label>
+        </div>
+        <div className="input-group">
+          <label>
+            User Prompt:
+            <textarea
+              value={userPrompt || ""}
+              onChange={handleInputChange(setUserPrompt)}
+              className="input-field"
+              rows={4}
+            />
+          </label>
+        </div>
+        <div className="input-group">
+          <label>
+            <input
+              type="checkbox"
+              checked={collectCSV}
+              onChange={handleCollectCSVChange}
+            />{" "}
+            CSV
+          </label>
+        </div>
+        <button onClick={handleSubmit} className="send-button">
+          Send
+        </button>
+        <div className="response-area break-word">
+          {loading ? "Busy..." : response}
+        </div>
       </div>
-      <div className="input-group">
-        <label>
-          System Prompt:
-          <textarea
-            value={systemPrompt || ""}
-            onChange={handleInputChange(setSystemPrompt)}
-            className="input-field"
-            rows={4}
-          />
-        </label>
-      </div>
-      <div className="input-group">
-        <label>
-          User Prompt:
-          <textarea
-            value={userPrompt || ""}
-            onChange={handleInputChange(setUserPrompt)}
-            className="input-field"
-            rows={4}
-          />
-        </label>
-      </div>
-      <div className="input-group">
-        <label>
-          <input
-            type="checkbox"
-            checked={collectCSV}
-            onChange={handleCollectCSVChange}
-          />{" "}
-          CSV
-        </label>
-      </div>
-      <button onClick={handleSubmit} className="send-button">
-        Send
-      </button>
-      <div className="response-area">{loading ? "Busy..." : response}</div>
       {collectCSV && cumulativeCSV.length > 0 && renderCSVTable()}
     </div>
   );
