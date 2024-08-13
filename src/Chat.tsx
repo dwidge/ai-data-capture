@@ -106,7 +106,7 @@ export const OpenAIChat: React.FC = () => {
               className="filter-tag"
               style={{ color: "red", margin: "0 5px" }}
             >
-              {`${column} = ${filter}`}{" "}
+              {`${column} = "${filter}"`}{" "}
               <button onClick={() => removeFilter(column, filter)}>x</button>
             </div>
           ))
