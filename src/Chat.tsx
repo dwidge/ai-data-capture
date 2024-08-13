@@ -8,6 +8,7 @@ import "./Chat.css";
 import { parseCSVLine } from "./utils/parseCSVLine";
 import CSVTable from "./CSVTable";
 import { SettingsContainer } from "./Settings";
+import { trimResponse } from "./utils/trimResponse";
 
 export const OpenAIChat: React.FC = () => {
   const [openaiKey, setOpenaiKey] = useOpenaiKey();
@@ -58,10 +59,9 @@ export const OpenAIChat: React.FC = () => {
         ],
       });
 
-      const trimmedResponse =
-        completion.choices[0]?.message?.content?.replace(/^```|```$/g, "") ||
-        "No response";
-      handleResponse(trimmedResponse);
+      handleResponse(
+        trimResponse(completion.choices[0]?.message?.content ?? "")
+      );
     } catch (error) {
       handleError(error);
     } finally {
