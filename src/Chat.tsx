@@ -14,7 +14,7 @@ export const OpenAIChat: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [collectCSV, setCollectCSV] = useState<boolean>(false);
   const [cumulativeCSV, setCumulativeCSV] = useState<string[][]>([]);
-  const [filters, setFilters] = useState<string[]>([]); // New state for filters
+  const [filters, setFilters] = useState<{ [column: string]: string[] }>({});
 
   const handleInputChange =
     (setter: React.Dispatch<React.SetStateAction<string | null>>) =>
@@ -26,7 +26,7 @@ export const OpenAIChat: React.FC = () => {
     setCollectCSV(e.target.checked);
     if (!e.target.checked) {
       setCumulativeCSV([]);
-      setFilters([]); // Reset filters if CSV collection is stopped
+      setFilters({});
     }
   };
 
@@ -99,21 +99,27 @@ export const OpenAIChat: React.FC = () => {
         className="filter-tags"
         style={{ display: "flex", flexWrap: "wrap", marginBottom: "10px" }}
       >
-        {filters.map((filter, index) => (
-          <div
-            key={index}
-            className="filter-tag"
-            style={{ color: "red", margin: "0 5px" }}
-          >
-            {filter} <button onClick={() => removeFilter(filter)}>x</button>
-          </div>
-        ))}
+        {Object.entries(filters).flatMap(([column, columnFilters]) =>
+          columnFilters.map((filter, index) => (
+            <div
+              key={`${column}-${index}`}
+              className="filter-tag"
+              style={{ color: "red", margin: "0 5px" }}
+            >
+              {`${column} = ${filter}`}{" "}
+              <button onClick={() => removeFilter(column, filter)}>x</button>
+            </div>
+          ))
+        )}
       </div>
     );
   };
 
-  const removeFilter = (filter: string) => {
-    setFilters(filters.filter((f) => f !== filter));
+  const removeFilter = (column: string, filter: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      [column]: prev[column].filter((f) => f !== filter),
+    }));
   };
 
   const renderCSVTable = () => {
@@ -124,9 +130,12 @@ export const OpenAIChat: React.FC = () => {
     // Filter cumulativeCSV based on filters and filterText
     const filteredCSV = applyFiltersToCSV(cumulativeCSV, filters, filterText);
 
-    const handleCellClick = (cell: string) => {
-      if (!filters.includes(cell)) {
-        setFilters([...filters, cell]);
+    const handleCellClick = (cell: string, column: string) => {
+      if (!filters[column]?.includes(cell)) {
+        setFilters((prev) => ({
+          ...prev,
+          [column]: [...(prev[column] || []), cell],
+        }));
       }
     };
 
@@ -152,7 +161,10 @@ export const OpenAIChat: React.FC = () => {
             <tr>
               {filteredCSV.length > 0 &&
                 filteredCSV[0].map((header, index) => (
-                  <th key={index} onClick={() => handleCellClick(header)}>
+                  <th
+                    key={index}
+                    onClick={() => handleCellClick(header, header)}
+                  >
                     {header}
                   </th>
                 ))}
@@ -162,7 +174,12 @@ export const OpenAIChat: React.FC = () => {
             {filteredCSV.slice(1).map((row, rowIndex) => (
               <tr key={rowIndex}>
                 {row.map((cell, cellIndex) => (
-                  <td key={cellIndex} onClick={() => handleCellClick(cell)}>
+                  <td
+                    key={cellIndex}
+                    onClick={() =>
+                      handleCellClick(cell, filteredCSV[0][cellIndex])
+                    }
+                  >
                     {cell}
                   </td>
                 ))}
@@ -306,16 +323,25 @@ const updateCumulativeCSV = (
 
 const applyFiltersToCSV = (
   rows: string[][],
-  excludes: string[],
+  excludes: { [column: string]: string[] },
   include: string
-): string[][] => {
-  return rows.filter((row, index) => {
-    // For the header row, return true to always show it
-    if (index === 0) return true;
+): string[][] =>
+  rows.filter((row, rowIndex) => {
+    // Always include the header row
+    if (rowIndex === 0) return true;
 
     // Check for excluded filters
-    const excludesFilters = excludes.some((filter) =>
-      row.some((cell) => cell.toLowerCase() === filter.toLowerCase())
+    const excludesFilters = Object.entries(excludes).some(
+      ([column, columnFilters]) => {
+        const headers = rows[0];
+        const colIndex = headers.indexOf(column); // Find the index of the column
+        if (colIndex === -1) return false; // Column doesn't exist
+
+        // Check if any filter applies to this column
+        return columnFilters.some(
+          (filter) => row[colIndex].toLowerCase() === filter.toLowerCase()
+        );
+      }
     );
 
     // Check for search text in any cell
@@ -323,7 +349,6 @@ const applyFiltersToCSV = (
       cell.toLowerCase().includes(include.toLowerCase())
     );
 
-    // Return true only if the row does not match filters and does include filterText
+    // Return true only if the row does not match any excludes AND does match the filter text
     return !excludesFilters && matchesFilterText;
   });
-};
