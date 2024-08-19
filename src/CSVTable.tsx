@@ -63,7 +63,6 @@ const CSVTable: React.FC<CSVTableProps> = ({
         className="filter-tags"
         style={{
           display: "flex",
-          flex: 1,
           flexDirection: "column",
           gap: ".5em",
         }}
@@ -109,7 +108,7 @@ const CSVTable: React.FC<CSVTableProps> = ({
   };
 
   return (
-    <div className="csv-table-container">
+    <div className="csv-container">
       <div className="csv-table-buttons">
         <button onClick={clearCSVData} className="clear-button">
           Clear Data
@@ -130,43 +129,48 @@ const CSVTable: React.FC<CSVTableProps> = ({
           />
         </label>
       </div>
-      <table className="csv-table">
-        <thead>
-          <tr>
-            {filteredCSV.length > 0 &&
-              filteredCSV[0].map((header, index) => (
-                <th key={index} onClick={() => handleCellClick(header, header)}>
-                  {header}
-                </th>
-              ))}
-          </tr>
-        </thead>
-        <tbody>
-          {cumulativeCSV.slice(1).map((row, rowIndex) =>
-            filterRow(cumulativeCSV[0], filters, filterText)(row) ? (
-              <tr
-                key={rowIndex}
-                style={{
-                  backgroundColor: highlightedRows.includes(rowIndex + 1)
-                    ? "#aaaaaa44"
-                    : "transparent",
-                }}
-              >
-                {row.map((cell, cellIndex) => (
-                  <td
-                    key={cellIndex}
-                    onClick={() =>
-                      handleCellClick(cell, filteredCSV[0][cellIndex])
-                    }
+      <div className="csv-table-container">
+        <table className="csv-table">
+          <thead>
+            <tr>
+              {filteredCSV.length > 0 &&
+                filteredCSV[0].map((header, index) => (
+                  <th
+                    key={index}
+                    onClick={() => handleCellClick(header, header)}
                   >
-                    {cell}
-                  </td>
+                    {header}
+                  </th>
                 ))}
-              </tr>
-            ) : null
-          )}
-        </tbody>
-      </table>
+            </tr>
+          </thead>
+          <tbody>
+            {cumulativeCSV.slice(1).map((row, rowIndex) =>
+              filterRow(cumulativeCSV[0], filters, filterText)(row) ? (
+                <tr
+                  key={rowIndex}
+                  style={{
+                    backgroundColor: highlightedRows.includes(rowIndex + 1)
+                      ? "#aaaaaa44"
+                      : "transparent",
+                  }}
+                >
+                  {row.map((cell, cellIndex) => (
+                    <td
+                      key={cellIndex}
+                      onClick={() =>
+                        handleCellClick(cell, filteredCSV[0][cellIndex])
+                      }
+                    >
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ) : null
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

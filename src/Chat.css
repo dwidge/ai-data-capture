@@ -66,10 +66,19 @@ label {
   white-space: break-spaces;
 }
 
-.csv-table-container {
-  overflow-x: auto;
+.csv-container {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  gap: 1em;
+  overflow: auto;
+}
+
+.csv-table-container {
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   gap: 1em;
 }
 
