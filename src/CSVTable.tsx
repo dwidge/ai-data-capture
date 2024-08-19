@@ -126,15 +126,13 @@ const CSVTable: React.FC<CSVTableProps> = ({
       </div>
       {!!Object.entries(filters).length && renderFilters()}
       <div className="input-group">
-        <label>
-          Search
-          <input
-            type="text"
-            value={filterText}
-            onChange={handleFilterChange}
-            className="input-field"
-          />
-        </label>
+        <input
+          type="text"
+          value={filterText}
+          onChange={handleFilterChange}
+          className="input-field"
+          placeholder="Search"
+        />
       </div>
       <div className="csv-table-container">
         <table className="csv-table">
