@@ -143,6 +143,19 @@ export const OpenAIChat: React.FC = () => {
 
   return (
     <div className="main-container">
+      {settings?.csv && (
+        <CSVTable
+          cumulativeCSV={cumulativeCSV}
+          setCumulativeCSV={setCumulativeCSV}
+          filters={filters}
+          setFilters={setFilters}
+          filterText={filterText}
+          setFilterText={setFilterText}
+          clearCSVData={clearCSVData}
+          highlightedRows={highlightedRows}
+        />
+      )}
+
       <div className="user-input-container">
         <div className="input-group">
           <label>
@@ -183,31 +196,19 @@ export const OpenAIChat: React.FC = () => {
       </div>
 
       {isSettingsOpen && (
-        <SettingsContainer
-          openaiKey={openaiKey}
-          systemPrompt={systemPrompt}
-          settings={settings}
-          onOpenaiKeyChange={setOpenaiKey}
-          onSystemPromptChange={setSystemPrompt}
-          onCollectCSVChange={handleCollectCSVChange}
-        />
-      )}
-
-      {settings?.csv ? (
-        <CSVTable
-          cumulativeCSV={cumulativeCSV}
-          setCumulativeCSV={setCumulativeCSV}
-          filters={filters}
-          setFilters={setFilters}
-          filterText={filterText}
-          setFilterText={setFilterText}
-          clearCSVData={clearCSVData}
-          highlightedRows={highlightedRows}
-        />
-      ) : (
-        <div className="response-area break-word">
-          {loading ? "Busy..." : response}
-        </div>
+        <>
+          <SettingsContainer
+            openaiKey={openaiKey}
+            systemPrompt={systemPrompt}
+            settings={settings}
+            onOpenaiKeyChange={setOpenaiKey}
+            onSystemPromptChange={setSystemPrompt}
+            onCollectCSVChange={handleCollectCSVChange}
+          />
+          <div className="response-area break-word">
+            {loading ? "Busy..." : response}
+          </div>
+        </>
       )}
     </div>
   );
