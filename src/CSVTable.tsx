@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 interface CSVTableProps {
   cumulativeCSV: string[][];
@@ -22,6 +22,8 @@ const CSVTable: React.FC<CSVTableProps> = ({
   clearCSVData,
   highlightedRows,
 }) => {
+  const bottomRef = useRef<HTMLTableSectionElement>(null);
+
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilterText(e.target.value);
   };
@@ -107,6 +109,11 @@ const CSVTable: React.FC<CSVTableProps> = ({
     }));
   };
 
+  useEffect(() => {
+    if (bottomRef.current)
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+  }, [cumulativeCSV]);
+
   return (
     <div className="csv-container">
       <div className="csv-table-buttons">
@@ -170,6 +177,7 @@ const CSVTable: React.FC<CSVTableProps> = ({
             )}
           </tbody>
         </table>
+        <div ref={bottomRef}> </div>
       </div>
     </div>
   );
