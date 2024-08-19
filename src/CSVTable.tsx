@@ -63,11 +63,7 @@ const CSVTable: React.FC<CSVTableProps> = ({
     return (
       <div
         className="filter-tags"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: ".5em",
-        }}
+        style={{ display: "flex", flexDirection: "column", gap: ".5em" }}
       >
         <label>Exclude</label>
         <div
@@ -116,7 +112,17 @@ const CSVTable: React.FC<CSVTableProps> = ({
 
   return (
     <div className="csv-container">
-      <div className="csv-table-buttons">
+      <div
+        className="csv-table-buttons"
+        style={{ display: "flex", alignItems: "center", gap: "1em" }}
+      >
+        <input
+          type="text"
+          value={filterText}
+          onChange={handleFilterChange}
+          className="input-field"
+          placeholder="Search"
+        />
         <button onClick={clearCSVData} className="clear-button">
           Clear Data
         </button>
@@ -125,15 +131,6 @@ const CSVTable: React.FC<CSVTableProps> = ({
         </button>
       </div>
       {!!Object.entries(filters).length && renderFilters()}
-      <div className="input-group">
-        <input
-          type="text"
-          value={filterText}
-          onChange={handleFilterChange}
-          className="input-field"
-          placeholder="Search"
-        />
-      </div>
       <div className="csv-table-container">
         <table className="csv-table">
           <thead>
@@ -175,7 +172,7 @@ const CSVTable: React.FC<CSVTableProps> = ({
             )}
           </tbody>
         </table>
-        <div ref={bottomRef}> </div>
+        <div ref={bottomRef}></div>
       </div>
     </div>
   );
