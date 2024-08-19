@@ -55,7 +55,7 @@ export const OpenAIChat: React.FC = () => {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (userPrompt: string | null) => {
     setLoading(true);
     try {
       if (!openaiKey) throw new Error("Please set an OpenAI API key.");
@@ -132,6 +132,15 @@ export const OpenAIChat: React.FC = () => {
     setHighlightedRows([]);
   };
 
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const pastedText = e.clipboardData.getData("text");
+    if (pastedText.length > 100) {
+      e.preventDefault();
+      setUserPrompt(pastedText);
+      handleSubmit(pastedText);
+    }
+  };
+
   return (
     <div className="main-container">
       <div className="user-input-container">
@@ -141,6 +150,7 @@ export const OpenAIChat: React.FC = () => {
               ref={textareaRef}
               value={userPrompt || ""}
               onChange={handleInputChange(setUserPrompt)}
+              onPaste={handlePaste}
               className="input-field"
               rows={4}
               onFocus={handleTextareaFocus}
@@ -163,7 +173,7 @@ export const OpenAIChat: React.FC = () => {
             Undo
           </button>
           <button
-            onClick={handleSubmit}
+            onClick={() => handleSubmit(userPrompt)}
             className="send-button"
             disabled={loading}
           >
