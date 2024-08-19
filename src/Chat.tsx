@@ -77,11 +77,14 @@ export const OpenAIChat: React.FC = () => {
 
   const handleResponse = (newResponse: string) => {
     setResponse(newResponse);
-    setCumulativeCSV(updateCumulativeCSV(newResponse, cumulativeCSV));
-
-    const newRowsCount = newResponse.trim().split("\n").length;
+    const newRows = updateCumulativeCSV(newResponse, cumulativeCSV);
+    setCumulativeCSV(newRows);
+    const oldWithoutHeader =
+      cumulativeCSV.length > 0 ? cumulativeCSV.length - 1 : 0;
+    const newWithoutHeader = newRows.length > 0 ? newRows.length - 1 : 0;
+    const newRowsCount = newWithoutHeader - oldWithoutHeader;
     setHighlightedRows(
-      [...Array(newRowsCount).keys()].map((i) => cumulativeCSV.length + i)
+      [...Array(newRowsCount).keys()].map((i) => 1 + oldWithoutHeader + i)
     );
   };
 
@@ -125,13 +128,25 @@ export const OpenAIChat: React.FC = () => {
 
   return (
     <div className="main-container">
-      <button
-        onClick={toggleSettings}
-        className="expander-button"
-        style={{ flex: 0 }}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "1em",
+        }}
       >
-        Settings
-      </button>
+        <div>All: {(cumulativeCSV.length || 1) - 1}</div>
+        <div>New: {highlightedRows.length}</div>
+        <button
+          onClick={toggleSettings}
+          className="expander-button"
+          style={{ flex: 0 }}
+        >
+          Settings
+        </button>
+      </div>
 
       {isSettingsOpen ? (
         <>
