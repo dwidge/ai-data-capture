@@ -41,12 +41,6 @@ export const OpenAIChat: React.FC = () => {
     };
   }, []);
 
-  const handleInputChange =
-    (setter: React.Dispatch<React.SetStateAction<string | null>>) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setter(e.target.value || null);
-    };
-
   const handleCollectCSVChange = (checked: boolean) => {
     setSettings({ ...settings, csv: checked });
     if (!checked) {
@@ -166,75 +160,134 @@ export const OpenAIChat: React.FC = () => {
           </div>
         </>
       ) : (
-        <>
-          <CSVTable
-            cumulativeCSV={cumulativeCSV}
-            setCumulativeCSV={setCumulativeCSV}
-            filters={filters}
-            setFilters={setFilters}
-            filterText={filterText}
-            setFilterText={setFilterText}
-            clearCSVData={clearCSVData}
-            highlightedRows={highlightedRows}
-          />
-          <div className="user-input-container">
-            <div
-              className="input-group"
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "stretch",
-                gap: "1em",
-              }}
-            >
-              <label
-                style={{
-                  flexGrow: 1,
-                  flex: 1,
-                  display: "flex",
-                  padding: 0,
-                  margin: 0,
-                }}
-              >
-                <textarea
-                  ref={textareaRef}
-                  value={userPrompt || ""}
-                  onChange={handleInputChange(setUserPrompt)}
-                  onPaste={handlePaste}
-                  className="input-field"
-                  style={{ height: "100%", margin: 0 }}
-                  onFocus={handleTextareaFocus}
-                />
-              </label>
-              <div
-                className="csv-table-buttons"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                <button
-                  onClick={deleteHighlightedRows}
-                  className={highlightedRows.length > 0 ? "undo-button" : ""}
-                  disabled={highlightedRows.length === 0}
-                >
-                  Undo
-                </button>
-                <button
-                  onClick={() => handleSubmit(userPrompt)}
-                  className="send-button"
-                  disabled={loading}
-                >
-                  {loading ? <div className="spinner" /> : "Submit"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
+        <ChatContainer
+          cumulativeCSV={cumulativeCSV}
+          setCumulativeCSV={setCumulativeCSV}
+          filters={filters}
+          setFilters={setFilters}
+          filterText={filterText}
+          setFilterText={setFilterText}
+          clearCSVData={clearCSVData}
+          highlightedRows={highlightedRows}
+          loading={loading}
+          response={response}
+          userPrompt={userPrompt}
+          setUserPrompt={setUserPrompt}
+          handleSubmit={handleSubmit}
+          deleteHighlightedRows={deleteHighlightedRows}
+          handleTextareaFocus={handleTextareaFocus}
+          handlePaste={handlePaste}
+          textareaRef={textareaRef}
+        />
       )}
     </div>
   );
 };
+
+const ChatContainer: React.FC<{
+  cumulativeCSV: string[][];
+  setCumulativeCSV: React.Dispatch<React.SetStateAction<string[][]>>;
+  filters: { [column: string]: string[] };
+  setFilters: React.Dispatch<
+    React.SetStateAction<{ [column: string]: string[] }>
+  >;
+  filterText: string;
+  setFilterText: React.Dispatch<React.SetStateAction<string>>;
+  clearCSVData: () => void;
+  highlightedRows: number[];
+  loading: boolean;
+  response: string | null;
+  userPrompt: string | null;
+  setUserPrompt: React.Dispatch<React.SetStateAction<string | null>>;
+  handleSubmit: (userPrompt: string | null) => void;
+  deleteHighlightedRows: () => void;
+  handleTextareaFocus: () => void;
+  handlePaste: (e: React.ClipboardEvent<HTMLTextAreaElement>) => void;
+  textareaRef: React.RefObject<HTMLTextAreaElement>;
+}> = ({
+  cumulativeCSV,
+  setCumulativeCSV,
+  filters,
+  setFilters,
+  filterText,
+  setFilterText,
+  clearCSVData,
+  highlightedRows,
+  loading,
+  userPrompt,
+  setUserPrompt,
+  handleSubmit,
+  deleteHighlightedRows,
+  handleTextareaFocus,
+  handlePaste,
+  textareaRef,
+}) => (
+  <>
+    <CSVTable
+      cumulativeCSV={cumulativeCSV}
+      setCumulativeCSV={setCumulativeCSV}
+      filters={filters}
+      setFilters={setFilters}
+      filterText={filterText}
+      setFilterText={setFilterText}
+      clearCSVData={clearCSVData}
+      highlightedRows={highlightedRows}
+    />
+    <div className="user-input-container">
+      <div
+        className="input-group"
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "stretch",
+          gap: "1em",
+        }}
+      >
+        <label
+          style={{
+            flexGrow: 1,
+            flex: 1,
+            display: "flex",
+            padding: 0,
+            margin: 0,
+          }}
+        >
+          <textarea
+            ref={textareaRef}
+            value={userPrompt || ""}
+            onChange={(e) => setUserPrompt(e.target.value || null)}
+            onPaste={handlePaste}
+            className="input-field"
+            style={{ height: "100%", margin: 0 }}
+            onFocus={handleTextareaFocus}
+          />
+        </label>
+        <div
+          className="csv-table-buttons"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <button
+            onClick={deleteHighlightedRows}
+            className={highlightedRows.length > 0 ? "undo-button" : ""}
+            disabled={highlightedRows.length === 0}
+          >
+            Undo
+          </button>
+          <button
+            onClick={() => handleSubmit(userPrompt)}
+            className="send-button"
+            disabled={loading}
+          >
+            {loading ? <div className="spinner" /> : "Submit"}
+          </button>
+        </div>
+      </div>
+    </div>
+  </>
+);
 
 const prepareSystemPrompt = (
   systemPrompt: string | null,
