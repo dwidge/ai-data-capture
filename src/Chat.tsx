@@ -150,85 +150,88 @@ export const OpenAIChat: React.FC = () => {
       >
         Settings
       </button>
-      <CSVTable
-        cumulativeCSV={cumulativeCSV}
-        setCumulativeCSV={setCumulativeCSV}
-        filters={filters}
-        setFilters={setFilters}
-        filterText={filterText}
-        setFilterText={setFilterText}
-        clearCSVData={clearCSVData}
-        highlightedRows={highlightedRows}
-      />
-      <div className="user-input-container">
-        <div
-          className="input-group"
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "stretch",
-            gap: "1em",
-          }}
-        >
-          <label
-            style={{
-              flexGrow: 1,
-              flex: 1,
-              display: "flex",
-              padding: 0,
-              margin: 0,
-            }}
-          >
-            <textarea
-              ref={textareaRef}
-              value={userPrompt || ""}
-              onChange={handleInputChange(setUserPrompt)}
-              onPaste={handlePaste}
-              className="input-field"
-              style={{ height: "100%", margin: 0 }}
-              onFocus={handleTextareaFocus}
-            />
-          </label>
-          <div
-            className="csv-table-buttons"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <button
-              onClick={deleteHighlightedRows}
-              className={highlightedRows.length > 0 ? "undo-button" : ""}
-              disabled={highlightedRows.length === 0}
-            >
-              Undo
-            </button>
-            <button
-              onClick={() => handleSubmit(userPrompt)}
-              className="send-button"
-              disabled={loading}
-            >
-              {loading ? <div className="spinner" /> : "Submit"}
-            </button>
-          </div>
-        </div>
 
-        {isSettingsOpen && (
-          <>
-            <SettingsContainer
-              openaiKey={openaiKey}
-              systemPrompt={systemPrompt}
-              settings={settings}
-              onOpenaiKeyChange={setOpenaiKey}
-              onSystemPromptChange={setSystemPrompt}
-              onCollectCSVChange={handleCollectCSVChange}
-            />
-            <div className="response-area break-word">
-              {loading ? "Busy..." : response}
+      {isSettingsOpen ? (
+        <>
+          <SettingsContainer
+            openaiKey={openaiKey}
+            systemPrompt={systemPrompt}
+            settings={settings}
+            onOpenaiKeyChange={setOpenaiKey}
+            onSystemPromptChange={setSystemPrompt}
+            onCollectCSVChange={handleCollectCSVChange}
+          />
+          <div className="response-area break-word">
+            {loading ? "Busy..." : response}
+          </div>
+        </>
+      ) : (
+        <>
+          <CSVTable
+            cumulativeCSV={cumulativeCSV}
+            setCumulativeCSV={setCumulativeCSV}
+            filters={filters}
+            setFilters={setFilters}
+            filterText={filterText}
+            setFilterText={setFilterText}
+            clearCSVData={clearCSVData}
+            highlightedRows={highlightedRows}
+          />
+          <div className="user-input-container">
+            <div
+              className="input-group"
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "stretch",
+                gap: "1em",
+              }}
+            >
+              <label
+                style={{
+                  flexGrow: 1,
+                  flex: 1,
+                  display: "flex",
+                  padding: 0,
+                  margin: 0,
+                }}
+              >
+                <textarea
+                  ref={textareaRef}
+                  value={userPrompt || ""}
+                  onChange={handleInputChange(setUserPrompt)}
+                  onPaste={handlePaste}
+                  className="input-field"
+                  style={{ height: "100%", margin: 0 }}
+                  onFocus={handleTextareaFocus}
+                />
+              </label>
+              <div
+                className="csv-table-buttons"
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <button
+                  onClick={deleteHighlightedRows}
+                  className={highlightedRows.length > 0 ? "undo-button" : ""}
+                  disabled={highlightedRows.length === 0}
+                >
+                  Undo
+                </button>
+                <button
+                  onClick={() => handleSubmit(userPrompt)}
+                  className="send-button"
+                  disabled={loading}
+                >
+                  {loading ? <div className="spinner" /> : "Submit"}
+                </button>
+              </div>
             </div>
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
