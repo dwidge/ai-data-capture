@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react"; // Added import for useRef
+import React, { useState, useRef, useEffect } from "react";
 import { useOpenaiKey } from "./hooks/useOpenaiKey";
 import { useSystemPrompt } from "./hooks/useSystemPrompt";
 import { useUserPrompt } from "./hooks/useUserPrompt";
@@ -24,6 +24,22 @@ export const OpenAIChat: React.FC = () => {
   const [highlightedRows, setHighlightedRows] = useState<number[]>([]);
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  // Use effect to focus on the textarea when the component mounts or when the window gets focused
+  useEffect(() => {
+    const handleFocus = () => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, []);
 
   const handleInputChange =
     (setter: React.Dispatch<React.SetStateAction<string | null>>) =>
