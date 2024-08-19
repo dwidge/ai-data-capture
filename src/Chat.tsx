@@ -143,19 +143,16 @@ export const OpenAIChat: React.FC = () => {
 
   return (
     <div className="main-container">
-      {settings?.csv && (
-        <CSVTable
-          cumulativeCSV={cumulativeCSV}
-          setCumulativeCSV={setCumulativeCSV}
-          filters={filters}
-          setFilters={setFilters}
-          filterText={filterText}
-          setFilterText={setFilterText}
-          clearCSVData={clearCSVData}
-          highlightedRows={highlightedRows}
-        />
-      )}
-
+      <CSVTable
+        cumulativeCSV={cumulativeCSV}
+        setCumulativeCSV={setCumulativeCSV}
+        filters={filters}
+        setFilters={setFilters}
+        filterText={filterText}
+        setFilterText={setFilterText}
+        clearCSVData={clearCSVData}
+        highlightedRows={highlightedRows}
+      />
       <div className="user-input-container">
         <div className="input-group">
           <label>
