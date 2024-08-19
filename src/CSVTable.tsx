@@ -65,7 +65,6 @@ const CSVTable: React.FC<CSVTableProps> = ({
         className="filter-tags"
         style={{ display: "flex", flexDirection: "column", gap: ".5em" }}
       >
-        <label>Exclude</label>
         <div
           style={{
             display: "grid",
