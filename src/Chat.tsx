@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { useOpenaiKey } from "./hooks/useOpenaiKey";
 import { useSystemPrompt } from "./hooks/useSystemPrompt";
 import { useUserPrompt } from "./hooks/useUserPrompt";
-import { useSettings } from "./hooks/useSettings";
 import OpenAi from "openai";
 import "./Chat.css";
 import CSVTable from "./CSVTable";
@@ -14,7 +13,6 @@ export const OpenAIChat: React.FC = () => {
   const [openaiKey, setOpenaiKey] = useOpenaiKey();
   const [systemPrompt, setSystemPrompt] = useSystemPrompt();
   const [userPrompt, setUserPrompt] = useUserPrompt();
-  const [settings, setSettings] = useSettings();
   const [response, setResponse] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [cumulativeCSV, setCumulativeCSV] = useState<string[][]>([]);
@@ -41,14 +39,6 @@ export const OpenAIChat: React.FC = () => {
     };
   }, []);
 
-  const handleCollectCSVChange = (checked: boolean) => {
-    setSettings({ ...settings, csv: checked });
-    if (!checked) {
-      setCumulativeCSV([]);
-      setFilters({});
-    }
-  };
-
   const handleSubmit = async (userPrompt: string | null) => {
     setLoading(true);
     try {
@@ -57,7 +47,6 @@ export const OpenAIChat: React.FC = () => {
 
       const effectiveSystemPrompt = prepareSystemPrompt(
         systemPrompt,
-        settings?.csv ?? false,
         cumulativeCSV
       );
 
@@ -88,8 +77,7 @@ export const OpenAIChat: React.FC = () => {
 
   const handleResponse = (newResponse: string) => {
     setResponse(newResponse);
-    if (settings)
-      setCumulativeCSV(updateCumulativeCSV(newResponse, cumulativeCSV));
+    setCumulativeCSV(updateCumulativeCSV(newResponse, cumulativeCSV));
 
     const newRowsCount = newResponse.trim().split("\n").length;
     setHighlightedRows(
@@ -150,10 +138,8 @@ export const OpenAIChat: React.FC = () => {
           <SettingsContainer
             openaiKey={openaiKey}
             systemPrompt={systemPrompt}
-            settings={settings}
             onOpenaiKeyChange={setOpenaiKey}
             onSystemPromptChange={setSystemPrompt}
-            onCollectCSVChange={handleCollectCSVChange}
           />
           <div className="response-area break-word">
             {loading ? "Busy..." : response}
@@ -291,14 +277,11 @@ const ChatContainer: React.FC<{
 
 const prepareSystemPrompt = (
   systemPrompt: string | null,
-  collectCSV: boolean,
   cumulativeCSV: string[][]
 ): string => {
   const headersString =
     cumulativeCSV.length > 0 ? cumulativeCSV[0]?.join(",") : "";
-  return collectCSV
-    ? `${
-        systemPrompt || ""
-      }\nalways respond in csv\nexisting headers:\n${headersString}`
-    : systemPrompt || "";
+  return `${
+    systemPrompt || ""
+  }\nalways respond in csv\nexisting headers:\n${headersString}`;
 };
