@@ -143,6 +143,13 @@ export const OpenAIChat: React.FC = () => {
 
   return (
     <div className="main-container">
+      <button
+        onClick={toggleSettings}
+        className="expander-button"
+        style={{ flex: 0 }}
+      >
+        Settings
+      </button>
       <CSVTable
         cumulativeCSV={cumulativeCSV}
         setCumulativeCSV={setCumulativeCSV}
@@ -154,8 +161,16 @@ export const OpenAIChat: React.FC = () => {
         highlightedRows={highlightedRows}
       />
       <div className="user-input-container">
-        <div className="input-group">
-          <label>
+        <div
+          className="input-group"
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "flex-start",
+            gap: "1em",
+          }}
+        >
+          <label style={{ flexGrow: 1 }}>
             <textarea
               ref={textareaRef}
               value={userPrompt || ""}
@@ -166,47 +181,46 @@ export const OpenAIChat: React.FC = () => {
               onFocus={handleTextareaFocus}
             />
           </label>
-        </div>
-        <div className="csv-table-buttons">
-          <button
-            onClick={toggleSettings}
-            className="expander-button"
-            style={{ flex: 0 }}
+          <div
+            className="csv-table-buttons"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
           >
-            Settings
-          </button>
-          <button
-            onClick={deleteHighlightedRows}
-            className={highlightedRows.length > 0 ? "undo-button" : ""}
-            disabled={highlightedRows.length === 0}
-          >
-            Undo
-          </button>
-          <button
-            onClick={() => handleSubmit(userPrompt)}
-            className="send-button"
-            disabled={loading}
-          >
-            {loading ? <div className="spinner" /> : "Submit"}
-          </button>
-        </div>
-      </div>
-
-      {isSettingsOpen && (
-        <>
-          <SettingsContainer
-            openaiKey={openaiKey}
-            systemPrompt={systemPrompt}
-            settings={settings}
-            onOpenaiKeyChange={setOpenaiKey}
-            onSystemPromptChange={setSystemPrompt}
-            onCollectCSVChange={handleCollectCSVChange}
-          />
-          <div className="response-area break-word">
-            {loading ? "Busy..." : response}
+            <button
+              onClick={deleteHighlightedRows}
+              className={highlightedRows.length > 0 ? "undo-button" : ""}
+              disabled={highlightedRows.length === 0}
+            >
+              Undo
+            </button>
+            <button
+              onClick={() => handleSubmit(userPrompt)}
+              className="send-button"
+              disabled={loading}
+            >
+              {loading ? <div className="spinner" /> : "Submit"}
+            </button>
           </div>
-        </>
-      )}
+        </div>
+
+        {isSettingsOpen && (
+          <>
+            <SettingsContainer
+              openaiKey={openaiKey}
+              systemPrompt={systemPrompt}
+              settings={settings}
+              onOpenaiKeyChange={setOpenaiKey}
+              onSystemPromptChange={setSystemPrompt}
+              onCollectCSVChange={handleCollectCSVChange}
+            />
+            <div className="response-area break-word">
+              {loading ? "Busy..." : response}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };
