@@ -166,18 +166,26 @@ export const OpenAIChat: React.FC = () => {
           style={{
             display: "flex",
             flexDirection: "row",
-            alignItems: "flex-start",
+            alignItems: "stretch",
             gap: "1em",
           }}
         >
-          <label style={{ flexGrow: 1 }}>
+          <label
+            style={{
+              flexGrow: 1,
+              flex: 1,
+              display: "flex",
+              padding: 0,
+              margin: 0,
+            }}
+          >
             <textarea
               ref={textareaRef}
               value={userPrompt || ""}
               onChange={handleInputChange(setUserPrompt)}
               onPaste={handlePaste}
               className="input-field"
-              rows={4}
+              style={{ height: "100%", margin: 0 }}
               onFocus={handleTextareaFocus}
             />
           </label>
