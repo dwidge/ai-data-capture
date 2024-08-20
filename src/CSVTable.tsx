@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { FilterTags } from "./FilterTags";
 
 interface CSVTableProps {
   cumulativeCSV: string[][];
@@ -59,51 +60,6 @@ const CSVTable: React.FC<CSVTableProps> = ({
     document.body.removeChild(link);
   };
 
-  const renderFilters = () => {
-    return (
-      <div
-        className="filter-tags"
-        style={{ display: "flex", flexDirection: "column", gap: ".5em" }}
-      >
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(15em, 1fr))",
-            gap: ".5em",
-          }}
-        >
-          {Object.entries(filters).flatMap(([column, columnFilters]) =>
-            columnFilters.map((filter, index) => (
-              <button
-                key={`${column}-${index}`}
-                className="filter-tag"
-                style={{
-                  color: "white",
-                  backgroundColor: "darkred",
-                  flex: 1,
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-                onClick={() => removeFilter(column, filter)}
-                aria-label={`Remove filter ${filter} from ${column}`}
-              >
-                <div style={{ fontStyle: "italic" }}>{`${column}`}</div>
-                <div>{`"${filter}"`}</div>
-              </button>
-            ))
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  const removeFilter = (column: string, filter: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      [column]: prev[column].filter((f) => f !== filter),
-    }));
-  };
-
   useEffect(() => {
     if (bottomRef.current)
       bottomRef.current.scrollIntoView({ behavior: "smooth" });
@@ -129,7 +85,9 @@ const CSVTable: React.FC<CSVTableProps> = ({
           Export CSV
         </button>
       </div>
-      {!!Object.entries(filters).length && renderFilters()}
+      {!!Object.entries(filters).length && (
+        <FilterTags filters={filters} setFilters={setFilters} />
+      )}
       <div className="csv-table-container">
         <table className="csv-table">
           <thead>
