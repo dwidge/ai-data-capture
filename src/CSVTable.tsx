@@ -12,6 +12,7 @@ interface CSVTableProps {
   setFilterText: React.Dispatch<React.SetStateAction<string>>;
   clearCSVData: () => void;
   highlightedRows: number[];
+  listName: string;
 }
 
 const CSVTable: React.FC<CSVTableProps> = ({
@@ -22,6 +23,7 @@ const CSVTable: React.FC<CSVTableProps> = ({
   setFilterText,
   clearCSVData,
   highlightedRows,
+  listName,
 }) => {
   const bottomRef = useRef<HTMLTableSectionElement>(null);
 
@@ -53,7 +55,7 @@ const CSVTable: React.FC<CSVTableProps> = ({
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
-    link.setAttribute("download", "cumulative.csv");
+    link.setAttribute("download", `${listName || "list"}.csv`);
     link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
@@ -155,25 +157,21 @@ const filterRow =
     include: string
   ) =>
   (row: string[]) => {
-    // Check for excluded filters
     const excludesFilters = Object.entries(excludes).some(
       ([column, columnFilters]) => {
-        const colIndex = headers.indexOf(column); // Find the index of the column
-        if (colIndex === -1) return false; // Column doesn't exist
+        const colIndex = headers.indexOf(column);
+        if (colIndex === -1) return false;
 
-        // Check if any filter applies to this column
         return columnFilters.some(
           (filter) => row[colIndex].toLowerCase() === filter.toLowerCase()
         );
       }
     );
 
-    // Check for search text in any cell
     const matchesFilterText = row.some((cell) =>
       cell.toLowerCase().includes(include.toLowerCase())
     );
 
-    // Return true only if the row does not match any excludes AND does match the filter text
     return !excludesFilters && matchesFilterText;
   };
 

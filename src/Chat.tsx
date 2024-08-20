@@ -24,7 +24,6 @@ export const OpenAIChat: React.FC = () => {
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
-  // Use effect to focus on the textarea when the component mounts or when the window gets focused
   useEffect(() => {
     const handleFocus = () => {
       if (textareaRef.current) {
@@ -34,7 +33,6 @@ export const OpenAIChat: React.FC = () => {
 
     window.addEventListener("focus", handleFocus);
 
-    // Cleanup the event listener on component unmount
     return () => {
       window.removeEventListener("focus", handleFocus);
     };
@@ -97,7 +95,7 @@ export const OpenAIChat: React.FC = () => {
     setCumulativeCSV([]);
     setFilters({});
     setFilterText("");
-    setHighlightedRows([]); // Reset highlighted rows
+    setHighlightedRows([]);
   };
 
   const toggleSettings = () => {
@@ -189,6 +187,7 @@ export const OpenAIChat: React.FC = () => {
           handleTextareaFocus={handleTextareaFocus}
           handlePaste={handlePaste}
           textareaRef={textareaRef}
+          listName={listName}
         />
       )}
     </div>
@@ -215,6 +214,7 @@ const ChatContainer: React.FC<{
   handleTextareaFocus: () => void;
   handlePaste: (e: React.ClipboardEvent<HTMLTextAreaElement>) => void;
   textareaRef: React.RefObject<HTMLTextAreaElement>;
+  listName: string;
 }> = ({
   cumulativeCSV,
   setCumulativeCSV,
@@ -232,6 +232,7 @@ const ChatContainer: React.FC<{
   handleTextareaFocus,
   handlePaste,
   textareaRef,
+  listName,
 }) => (
   <>
     <CSVTable
@@ -243,6 +244,7 @@ const ChatContainer: React.FC<{
       setFilterText={setFilterText}
       clearCSVData={clearCSVData}
       highlightedRows={highlightedRows}
+      listName={listName}
     />
     <div className="user-input-container">
       <div
