@@ -19,36 +19,53 @@ export const FilterTags: React.FC<FilterTagsProps> = ({
   return (
     <div
       className="filter-tags"
-      style={{ display: "flex", flexDirection: "column", gap: ".5em" }}
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(15em, 1fr))",
+        gap: ".5em",
+      }}
     >
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(15em, 1fr))",
-          gap: ".5em",
-        }}
-      >
-        {Object.entries(filters).flatMap(([column, columnFilters]) =>
-          columnFilters.map((filter, index) => (
-            <button
-              key={`${column}-${index}`}
-              className="filter-tag"
+      {Object.entries(filters).flatMap(([column, columnFilters]) =>
+        columnFilters.map((filter, index) => (
+          <button
+            key={`${column}-${index}`}
+            className="filter-tag"
+            style={{
+              padding: 0,
+              color: "white",
+              backgroundColor: "transparent",
+              borderRadius: "5px",
+              borderColor: "darkred",
+              borderWidth: 2,
+              flex: 1,
+              display: "flex",
+              gap: ".5em",
+            }}
+            onClick={() => removeFilter(column, filter)}
+            aria-label={`Remove filter ${filter} from ${column}`}
+          >
+            <div
               style={{
-                color: "white",
+                fontSize: "0.9em",
+                fontStyle: "italic",
+                padding: ".3em .5em",
                 backgroundColor: "darkred",
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
               }}
-              onClick={() => removeFilter(column, filter)}
-              aria-label={`Remove filter ${filter} from ${column}`}
             >
-              <div style={{ fontStyle: "italic" }}>{`${column}`}</div>
-              <div>{`"${filter}"`}</div>
-            </button>
-          ))
-        )}
-      </div>
+              {column}
+            </div>
+            <div
+              style={{
+                flex: 1,
+                fontSize: "0.9em",
+                padding: ".3em .5em",
+              }}
+            >
+              {filter}
+            </div>
+          </button>
+        ))
+      )}
     </div>
   );
 };
