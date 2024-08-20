@@ -20,6 +20,7 @@ export const OpenAIChat: React.FC = () => {
   const [filterText, setFilterText] = useState<string>("");
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [highlightedRows, setHighlightedRows] = useState<number[]>([]);
+  const [listName, setListName] = useState<string>("");
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -137,6 +138,15 @@ export const OpenAIChat: React.FC = () => {
           gap: "1em",
         }}
       >
+        <div style={{ flexGrow: 1 }}>
+          <input
+            className="input-field"
+            type="text"
+            placeholder="List Name"
+            value={listName}
+            onChange={(e) => setListName(e.target.value)}
+          />
+        </div>
         <div>All: {(cumulativeCSV.length || 1) - 1}</div>
         <div>New: {highlightedRows.length}</div>
         <button
