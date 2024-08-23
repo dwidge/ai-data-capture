@@ -1,7 +1,7 @@
 .filter-tags {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(15em, 1fr));
-  gap: .5em;
+  gap: 0.5em;
 }
 
 .filter-tag {
@@ -12,7 +12,7 @@
   border-color: darkred;
   border-width: 2px;
   display: flex;
-  gap: .5em;
+  gap: 0.5em;
   flex: 1;
   cursor: pointer;
 }
@@ -20,12 +20,19 @@
 .filter-tag-column {
   font-size: 0.9em;
   font-style: italic;
-  padding: .3em .5em;
+  padding: 0.3em 0.5em;
+  color: white;
   background-color: darkred;
 }
 
 .filter-tag-filter {
   flex: 1;
   font-size: 0.9em;
-  padding: .3em .5em;
+  padding: 0.3em 0.5em;
+}
+
+@media (prefers-color-scheme: light) {
+  .filter-tag {
+    color: black;
+  }
 }

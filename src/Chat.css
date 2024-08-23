@@ -104,6 +104,12 @@ button {
   background-color: #525252; /* Differentiate header row */
 }
 
+@media (prefers-color-scheme: light) {
+  .csv-table th {
+    background-color: #c7c7c7; /* Differentiate header row */
+  }
+}
+
 .send-button {
   background-color: #327534; /* Green */
   color: white;
