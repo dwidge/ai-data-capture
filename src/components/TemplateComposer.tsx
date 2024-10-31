@@ -19,68 +19,84 @@ export const TemplateComposer = ({
   templateData: [templateData, setTemplateData] = useTemplateData(),
   templateString: [templateString, setTemplateString] = useState(""),
   handleDownload = async () => {
-    const zipBlob = await createBulkZip(templateString, csv, listName);
+    const zipBlob = await createBulkZip(
+      templateString,
+      csv,
+      templateData.filename
+    );
     saveAs(zipBlob, listName + ".zip");
   },
   csvHeaders = (csv[0] ?? []) as string[],
-}) => {
-  return (
-    <div className="Composer">
-      <div
-        style={{
-          justifyContent: "space-between",
-          gap: "1em",
-          flexWrap: "wrap",
-        }}
-      >
-        <SwitchButton
-          value={templateData.type}
-          setValue={(type) =>
-            setTemplateData(
-              (prev) => ({ ...prev, type } as CustomTemplate | EmailTemplate)
-            )
-          }
-          options={[
-            { value: "custom", label: "Custom" },
-            { value: "email", label: "Email" },
-          ]}
-        />
+}) => (
+  <div className="Composer">
+    <div
+      style={{
+        justifyContent: "space-between",
+        gap: "1em",
+        flexWrap: "wrap",
+      }}
+    >
+      <SwitchButton
+        value={templateData.type}
+        setValue={(type) =>
+          setTemplateData(
+            (prev) => ({ ...prev, type } as CustomTemplate | EmailTemplate)
+          )
+        }
+        options={[
+          { value: "custom", label: "Custom" },
+          { value: "email", label: "Email" },
+        ]}
+      />
+      <div style={{ gap: 10 }}>
+        <label>
+          Filename
+          <input
+            type="text"
+            value={templateData.filename}
+            onChange={(e) =>
+              setTemplateData((prev) => ({
+                ...prev,
+                filename: e.target.value || "",
+              }))
+            }
+          />
+        </label>
         <button className="action-button" onClick={handleDownload}>
           Download {Math.max(0, csv.length - 1)}{" "}
           {templateData.type.toLocaleUpperCase()} as ZIP
         </button>
       </div>
-      {templateData.type === "custom" ? (
-        <CustomTemplateComposer
-          templateData={
-            [templateData, setTemplateData] as State<CustomTemplate>
-          }
-          templateString={[templateString, setTemplateString]}
-          headers={csvHeaders}
-        />
-      ) : (
-        <EmailTemplateComposer
-          templateData={[templateData, setTemplateData] as State<EmailTemplate>}
-          templateString={[templateString, setTemplateString]}
-          headers={csvHeaders}
-        />
-      )}
     </div>
-  );
-};
+    {templateData.type === "custom" ? (
+      <CustomTemplateComposer
+        templateData={[templateData, setTemplateData] as State<CustomTemplate>}
+        templateString={[templateString, setTemplateString]}
+        headers={csvHeaders}
+      />
+    ) : (
+      <EmailTemplateComposer
+        templateData={[templateData, setTemplateData] as State<EmailTemplate>}
+        templateString={[templateString, setTemplateString]}
+        headers={csvHeaders}
+      />
+    )}
+  </div>
+);
 
 const createBulkZip = async (
   template: string,
   csv: string[][],
-  filename = "template"
+  filenamePattern = "template{#}.txt"
 ) => {
   const zip = new JSZip();
 
   for (let i = 1; i < csv.length; i++) {
-    const headers = csv[0];
-    const row = csv[i];
+    const headers = ["#", ...csv[0]];
+    const row = ["" + i, ...csv[i]];
     const templateData = replacePlaceholders(template, row, headers);
-    zip.file(`${filename}_${i}.txt`, templateData);
+    const filename = replacePlaceholders(filenamePattern, row, headers);
+    zip.file(filename, templateData);
   }
 
   return await zip.generateAsync({ type: "blob" });

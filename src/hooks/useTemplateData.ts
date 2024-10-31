@@ -4,7 +4,7 @@ import { useJson } from "./useJson";
 import { useLocalStorage } from "./useLocalStorage";
 
 export const useTemplateData = () =>
-  useJson<CustomTemplate | EmailTemplate>(
+  useJson<(CustomTemplate | EmailTemplate) & { filename?: string }>(
     useLocalStorage("template_data", null),
     {
       type: "custom",
