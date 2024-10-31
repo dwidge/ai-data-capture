@@ -1,10 +1,14 @@
-import React, { useState, useRef, useEffect } from "react";
+import OpenAi from "openai";
+import React, { useEffect, useRef, useState } from "react";
+import "./Chat.css";
+import { SwitchButton } from "./components/SwitchButton";
+import { TemplateComposer } from "./components/TemplateComposer";
+import CSVTable from "./CSVTable";
+import { useCsvData } from "./hooks/useCsvData";
+import { useListName } from "./hooks/useListName";
 import { useOpenaiKey } from "./hooks/useOpenaiKey";
 import { useSystemPrompt } from "./hooks/useSystemPrompt";
 import { useUserPrompt } from "./hooks/useUserPrompt";
-import OpenAi from "openai";
-import "./Chat.css";
-import CSVTable from "./CSVTable";
 import { SettingsContainer } from "./Settings";
 import { trimResponse } from "./utils/trimResponse";
 import { updateCumulativeCSV } from "./utils/updateCumulativeCSV";
@@ -15,12 +19,12 @@ export const OpenAIChat: React.FC = () => {
   const [userPrompt, setUserPrompt] = useUserPrompt();
   const [response, setResponse] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [cumulativeCSV, setCumulativeCSV] = useState<string[][]>([]);
+  const [cumulativeCSV, setCumulativeCSV] = useCsvData();
   const [filters, setFilters] = useState<{ [column: string]: string[] }>({});
   const [filterText, setFilterText] = useState<string>("");
-  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [mode, setMode] = useState<"settings" | "table" | "template">("table");
   const [highlightedRows, setHighlightedRows] = useState<number[]>([]);
-  const [listName, setListName] = useState<string>("");
+  const [listName, setListName] = useListName();
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -98,10 +102,6 @@ export const OpenAIChat: React.FC = () => {
     setHighlightedRows([]);
   };
 
-  const toggleSettings = () => {
-    setIsSettingsOpen((prev) => !prev);
-  };
-
   const handleTextareaFocus = () => {
     if (textareaRef.current) {
       textareaRef.current.select();
@@ -141,22 +141,24 @@ export const OpenAIChat: React.FC = () => {
             className="input-field"
             type="text"
             placeholder="List Name"
-            value={listName}
+            value={listName ?? ""}
             onChange={(e) => setListName(e.target.value)}
           />
         </div>
         <div>All: {(cumulativeCSV.length || 1) - 1}</div>
         <div>New: {highlightedRows.length}</div>
-        <button
-          onClick={toggleSettings}
-          className="expander-button"
-          style={{ flex: 0 }}
-        >
-          Settings
-        </button>
+        <SwitchButton
+          value={mode}
+          setValue={setMode}
+          options={[
+            { label: "Table", value: "table" },
+            { label: "Template", value: "template" },
+            { label: "Settings", value: "settings" },
+          ]}
+        />
       </div>
 
-      {isSettingsOpen ? (
+      {mode === "settings" ? (
         <>
           <SettingsContainer
             openaiKey={openaiKey}
@@ -168,6 +170,11 @@ export const OpenAIChat: React.FC = () => {
             {loading ? "Busy..." : response}
           </div>
         </>
+      ) : mode === "template" ? (
+        <TemplateComposer
+          csv={[cumulativeCSV, setCumulativeCSV]}
+          listName={listName ?? ""}
+        />
       ) : (
         <ChatContainer
           cumulativeCSV={cumulativeCSV}
@@ -187,7 +194,7 @@ export const OpenAIChat: React.FC = () => {
           handleTextareaFocus={handleTextareaFocus}
           handlePaste={handlePaste}
           textareaRef={textareaRef}
-          listName={listName}
+          listName={listName ?? ""}
         />
       )}
     </div>
@@ -248,7 +255,7 @@ const ChatContainer: React.FC<{
     />
     <div className="user-input-container">
       <div
-        className="input-group"
+        className="input-group stretch"
         style={{
           display: "flex",
           flexDirection: "row",
@@ -257,6 +264,7 @@ const ChatContainer: React.FC<{
         }}
       >
         <label
+          className="stretch"
           style={{
             flexGrow: 1,
             flex: 1,
@@ -284,14 +292,14 @@ const ChatContainer: React.FC<{
         >
           <button
             onClick={deleteHighlightedRows}
-            className={highlightedRows.length > 0 ? "undo-button" : ""}
+            className={highlightedRows.length > 0 ? "warn-button" : ""}
             disabled={highlightedRows.length === 0}
           >
             Undo
           </button>
           <button
             onClick={() => handleSubmit(userPrompt)}
-            className="send-button"
+            className="action-button"
             disabled={loading}
           >
             {loading ? <div className="spinner" /> : "Submit"}

@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { FilterTags } from "./FilterTags";
+import { downloadBlob } from "./utils/downloadBlob";
+import { updateCumulativeCSV } from "./utils/updateCumulativeCSV";
 
 interface CSVTableProps {
   cumulativeCSV: string[][];
@@ -17,6 +19,7 @@ interface CSVTableProps {
 
 const CSVTable: React.FC<CSVTableProps> = ({
   cumulativeCSV,
+  setCumulativeCSV,
   filters,
   setFilters,
   filterText,
@@ -26,6 +29,7 @@ const CSVTable: React.FC<CSVTableProps> = ({
   listName,
 }) => {
   const bottomRef = useRef<HTMLTableSectionElement>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilterText(e.target.value);
@@ -42,7 +46,17 @@ const CSVTable: React.FC<CSVTableProps> = ({
     }
   };
 
-  const downloadCSV = () => {
+  const importCSV = (file: File | undefined) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const csvText = reader.result as string;
+      setCumulativeCSV(updateCumulativeCSV(csvText, cumulativeCSV));
+    };
+    reader.readAsText(file);
+  };
+
+  const exportCSV = () => {
     const filteredCSVToExport = applyFiltersToCSV(
       cumulativeCSV,
       filters,
@@ -52,14 +66,7 @@ const CSVTable: React.FC<CSVTableProps> = ({
       .map((row) => row.map(wrapInQuotes).join(","))
       .join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `${listName || "list"}.csv`);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    downloadBlob(blob, `${listName || "list"}.csv`);
   };
 
   useEffect(() => {
@@ -69,6 +76,13 @@ const CSVTable: React.FC<CSVTableProps> = ({
 
   return (
     <div className="csv-container">
+      <input
+        type="file"
+        accept=".csv"
+        onChange={(e) => importCSV(e.target.files?.[0])}
+        ref={fileInputRef}
+        style={{ display: "none" }}
+      />
       <div
         className="csv-table-buttons"
         style={{ display: "flex", alignItems: "center", gap: "1em" }}
@@ -80,10 +94,16 @@ const CSVTable: React.FC<CSVTableProps> = ({
           className="input-field"
           placeholder="Search"
         />
-        <button onClick={clearCSVData} className="clear-button">
+        <button onClick={clearCSVData} className="danger-button">
           Clear Data
         </button>
-        <button onClick={downloadCSV} className="export-button">
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="action-button"
+        >
+          Import CSV
+        </button>
+        <button onClick={exportCSV} className="action-button">
           Export CSV
         </button>
       </div>

@@ -17,3 +17,10 @@ export const parseCSVLine = (line: string): string[] => {
 
   return result.map((value) => value.trim().replace(/^"(.*)"$/, "$1"));
 };
+
+export const parseCsvDoc = (text: string): string[][] => {
+  return text
+    .trim()
+    .split("\n")
+    .map((row) => parseCSVLine(row));
+};

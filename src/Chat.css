@@ -1,18 +1,9 @@
-.main-container {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 1em;
-}
-
+.main-container,
 .settings-container {
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0px 8px rgba(255, 255, 255, 0.1);
-  background-color: #202020;
+  gap: 1em;
 }
 
 h1 {
@@ -25,21 +16,34 @@ label {
   font-weight: 500;
 }
 
+input[type="text"],
+textarea,
 .input-field {
   width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
-  resize: vertical;
 }
 
-.textarea {
+textarea {
+  height: 10em;
   min-height: 80px;
+  resize: vertical;
+  flex: 1;
 }
 
-.send-button:hover {
-  background-color: #45a049;
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  box-shadow: inset 0 0 0 99999px rgba(255, 255, 255, 0.2);
 }
 
 .response-area {
@@ -80,14 +84,6 @@ label {
   gap: 1em;
 }
 
-button {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
-}
-
 .csv-table {
   min-width: 100%;
   border-collapse: collapse;
@@ -110,51 +106,37 @@ button {
   }
 }
 
-.send-button {
-  background-color: #327534; /* Green */
+.action-button {
+  background-color: #327534;
   color: white;
 }
 
-.undo-button {
+.warn-button {
   background-color: #756532;
   color: white;
 }
 
-.export-button {
-  background-color: #327534; /* Green */
+.danger-button {
+  background-color: #b42f25;
   color: white;
 }
 
-.export-button:hover {
-  background-color: #45a049; /* Darker green on hover */
-}
-
-.clear-button {
-  background-color: #b42f25; /* Red */
+.switch-button {
+  background-color: #286ab1;
   color: white;
-}
-
-.clear-button:hover {
-  background-color: #d32f2f; /* Darker red on hover */
 }
 
 /* Light Mode Adjustments */
 @media (prefers-color-scheme: light) {
   .settings-container {
-    background-color: #f8f8f8; /* Light mode background */
+    background-color: #f8f8f8;
     box-shadow: 0 0px 8px rgba(0, 0, 0, 0.1);
   }
   h1 {
-    color: #333; /* Heading Color for Light Mode */
-  }
-  .send-button {
-    background-color: #4caf50; /* Button Background for Light Mode */
-  }
-  .send-button:hover {
-    background-color: #45a049; /* Button Hover Color for Light Mode */
+    color: #333;
   }
   .response-area {
-    background-color: #eee; /* Light Mode Response Area Background */
+    background-color: #eee;
   }
 }
 
@@ -174,4 +156,10 @@ button {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.red {
+  padding: 2em;
+  background-color: red;
+  border: solid 1px white;
 }
